@@ -1,7 +1,7 @@
-.b = import('../../base') # %or%
-.io = import('../../io')
+.b = import('ebits/base') # %or%
+.io = import('ebits/io')
+.ar = import('ebits/array')
 .p = import('../path')
-.ar = import('../../array')
 
 #' Landmark probes
 landmarks = as.character(read.table(file.path(module_file(),'rid_landmarks.txt'))$V1)

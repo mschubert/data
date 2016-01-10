@@ -1,9 +1,9 @@
 # read raw data from .txt.gz files
 # save into R objects for quicker loading
 library(dplyr)
+.io = import('ebits/io')
+.ar = import('ebits/array')
 .path = import('../path')
-.io = import('../../io')
-.ar = import('../../array')
 util = import('./util')
 
 #' Regular expression for RNA seq v1 files

@@ -1,4 +1,4 @@
-.b = import('../../base')
+.b = import('ebits/base')
 .file = import('./file')
 
 DRUG_PROPS = .file$get('DRUG_PROPS')

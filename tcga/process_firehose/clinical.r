@@ -1,9 +1,9 @@
 # read raw data from .txt.gz files
 # save into R objects for quicker loading
 library(dplyr)
+.b = import('ebits/base')
+.io = import('ebits/io')
 .p = import('../path')
-.b = import('../../base')
-.io = import('../../io')
 util = import('./util')
 
 #' Regular expression for RPPA files

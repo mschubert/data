@@ -1,7 +1,7 @@
 library(dplyr)
 library(tidyr)
 library(cgdsr)
-.omit = import('../../base/omit')
+.omit = import('ebits/base/omit')
 .p = import('../path')
 .mycgds = cgdsr::CGDS("http://www.cbioportal.org/public-portal/")
 

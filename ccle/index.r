@@ -1,9 +1,9 @@
-.p = import('../path')
-.b = import('../../base')
-.io = import('../../io')
-.ar = import('../../array')
-.df = import('../../data_frame')
+.b = import('ebits/base')
+.io = import('ebits/io')
+.ar = import('ebits/array')
+.df = import('ebits/data_frame')
 .gdsc = import('../gdsc')
+.p = import('../path')
 
 index = .p$read("ccle", "CCLE_sample_info_file_2012-10-18.txt", header=TRUE)
 index$COSMIC = .gdsc$cosmic$name2id(index$Cell.line.primary.name, warn=FALSE)
@@ -16,7 +16,7 @@ basal_expression = function(index_type="COSMIC") {
     fname = "CCLE_Expression.Arrays_2013-03-18"
     if (!.p$exists("ccle", fname, ext=".RData")) {
         warning("data file does not exist, creating raw .CEL files")
-        ma = import('process/microarray')
+        ma = import('ebits/process/microarray')
         fnames = list.files(fname, full.names=TRUE)
         expr = oligo::read.celfiles(fnames) %>%
             ma$normalize() %>%

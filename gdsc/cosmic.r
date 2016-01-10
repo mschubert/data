@@ -1,4 +1,4 @@
-.b = import('../../base')
+.b = import('ebits/base')
 .file = import('./file')
 
 MASTER_LIST = .file$get('MASTER_LIST')

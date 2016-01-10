@@ -1,6 +1,6 @@
 library(dplyr)
+.io = import('ebits/io')
 .p = import('../path')
-.io = import('../../io')
 
 # see https://tcga-data.nci.nih.gov/datareports/codeTablesReport.htm
 codes = list(center_code = 'code_tables/center_code.txt',

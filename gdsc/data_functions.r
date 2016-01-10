@@ -1,6 +1,6 @@
 library(dplyr)
-.b = import('../../base')
-.ar = import('../../array')
+.b = import('ebits/base')
+.ar = import('ebits/array')
 .file = import('./file')
 cosmic = import('./cosmic')
 drug = import('./drug')
@@ -73,8 +73,8 @@ drug_response = function(metric='IC50s', tissue=NULL, filter_cosmic=TRUE, drug_n
     else
         stop("invalid metric")
 
-    ar = import('array')
-    io = import('io')
+    ar = import('ebits/array')
+    io = import('ebits/io')
     tissues = tissues()
     stages = io$read_table(module_file('drugs_s1f.csv'), header=TRUE)
 

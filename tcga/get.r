@@ -1,5 +1,5 @@
+.io = import('ebits/io')
 .p = import('../path')
-.io = import('../../io')
 
 #' List all available ID types
 id_types = c("patient", "specimen", "full")

@@ -2,7 +2,7 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
     if (!force && file.exists(file.path(icgc_data_dir, fname)))
         return()
 
-    idmap = import('process/idmap')
+    idmap = import('ebits/process/idmap')
     efiles = list.files(icgc_raw_dir, regex, recursive=T, full.names=T)
 
     file2matrix = function(fname) {

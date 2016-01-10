@@ -1,5 +1,5 @@
-.b = import('../base')
-.io = import('../io')
+.b = import('ebits/base')
+.io = import('ebits/io')
 
 path = function(mod_str=NULL) {
     getOption(paste("data.dir", mod_str, sep=".")) %or%

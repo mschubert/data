@@ -1,5 +1,5 @@
-.b = import('base')
-.io = import('io')
+.b = import('ebits/base')
+.io = import('ebits/io')
 .p = import('../path')
 
 .icgc_data_dir = .p$path('icgc')

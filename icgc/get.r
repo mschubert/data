@@ -1,6 +1,6 @@
-.b = import('base')
-.ar = import('array')
-.io = import('io')
+.b = import('ebits/base')
+.ar = import('ebits/array')
+.io = import('ebits/io')
 .i = import('./indexing')
 .p = import('../path')
 
