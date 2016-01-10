@@ -50,7 +50,7 @@ drivers = function(tissue=NULL) {
 basal_expression = function() {
     obj = .file$get('BASAL_EXPRESSION')
     rownames(obj$DATA) = obj$GENE_SYMBOLS
-    obj$DATA
+    obj$DATA[rownames(obj$DATA) != "",]
 }
 
 #' Returns a drug response matrix using the filters specified
@@ -62,9 +62,10 @@ basal_expression = function() {
 #' @param min_tissue_measured  Minimum number of measured responses per tissue, NA otherwise
 #' @param drop           Remove columns that only contain NAs
 #' @param median_top     Include only drug responses where the tissue median is in the top N tissues
+#' @param stage          The minimum clinical stage; 0: experimental, 1: in dev; 2: approved
 #' @return               A filtered and ID-mapped drug response matrix
 drug_response = function(metric='IC50s', tissue=NULL, filter_cosmic=TRUE, drug_names=TRUE,
-        cell_names=FALSE, min_tissue_measured=0, drop=FALSE, median_top=NA) {
+        cell_names=FALSE, min_tissue_measured=0, drop=FALSE, median_top=NA, stage=0) {
     if (grepl("IC50", metric))
         SCREENING = .file$get('DRUG_IC50')
     else if (grepl("AUC", metric))
@@ -73,7 +74,9 @@ drug_response = function(metric='IC50s', tissue=NULL, filter_cosmic=TRUE, drug_n
         stop("invalid metric")
 
     ar = import('array')
+    io = import('io')
     tissues = tissues()
+    stages = io$read_table(module_file('drugs_s1f.csv'), header=TRUE)
 
     if (is.numeric(median_top)) {
         ar$intersect(SCREENING, tissues, along=1)
@@ -101,6 +104,21 @@ drug_response = function(metric='IC50s', tissue=NULL, filter_cosmic=TRUE, drug_n
                 if (sum(SCREENING[tt==tissues, did] <
                         drug$conc('max',ids=did), na.rm=TRUE) < min_tissue_measured)
                     SCREENING[tt==tissues, did] = NA
+    }
+
+    if (stage > 0) {
+        if (stage == 1)
+            keep = stages %>%
+                filter(`Clinical Stage` != "experimental") %>%
+                select(Identifier) %>%
+                unlist() %>% unname()
+        if (stage == 2)
+            keep = stages %>%
+                filter(`Clinical Stage` == "clinically approved") %>%
+                select(Identifier) %>%
+                unlist() %>% unname()
+
+        SCREENING = SCREENING[,intersect(colnames(SCREENING), as.character(keep))]
     }
 
     if (drug_names)
