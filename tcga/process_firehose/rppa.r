@@ -4,7 +4,7 @@ library(dplyr)
 .b = import('ebits/base')
 .io = import('ebits/io')
 .ar = import('ebits/array')
-.p = import('../path')
+.p = import('../../path')
 util = import('./util')
 
 #' Regular expression for RPPA files

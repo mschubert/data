@@ -3,7 +3,7 @@
 library(dplyr)
 .io = import('ebits/io')
 .ar = import('ebits/array')
-.path = import('../path')
+.path = import('../../path')
 util = import('./util')
 
 #' Regular expression for RNA seq v1 files
