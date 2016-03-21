@@ -22,7 +22,10 @@ file2clinical = function(fname, quiet=FALSE) {
     colnames(ff) = ff[1,]
     ff = ff[-1,]
     ff = as.data.frame(ff)
-    ff$study = .b$grep("gdac.broadinstitute.org_([A-Z]+)", fname)
+
+    if (!"admin.disease_code" %in% colnames(ff))
+        stop("disease code not provided")
+
     ff
 }
 
@@ -37,8 +40,8 @@ clinical = function(regex=archive_regex, dir=util$data_dir, save=NULL) {
         util$unpack() %>%
         util$select("clin\\.merged\\.txt")
 
-#    clist = clist[-24] #FIXME: remove OV, invalid number of fields
-    cdata = lapply(clist, file2clinical)
+    cdata = lapply(clist, function(...) try(file2clinical(...)))
+    cdata = cdata[sapply(cdata, class) != "try-error"]
 
     cnames = do.call(.b$intersect, lapply(cdata, colnames))
     cc = do.call(rbind, lapply(cdata, function(x) x[,cnames]))
