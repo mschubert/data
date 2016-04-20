@@ -11,15 +11,15 @@ util = import('./util')
 archive_regex = "Mutation_Packager_Calls.Level_3.*\\.tar(\\.gz)?$"
 
 #' Metadata fields to keep
-keep_fields = c('Chromosome','UniProt_AApos','Tumor_Validation_Allele2',
-    'Transcript_Position', 'Score', 'chromosome_name_WU',
-    'ucsc_cons_WU', 'Tumor_Seq_Allele2', 'variant_WU',
-    'ucsc_cons', 'chromosome_name', 'Validation_Method',
-    'NVarCov', 'NVarRat', 'COSMIC_Gene_Freq', 'CGC_Mutation_Type',
-    'Reference_Allele', 'Tumor_Seq_Allele1', 'Match_Norm_Seq_Allele1',
-    'Match_Norm_Seq_Allele2', 'Tumor_Validation_Allele1',
-    'Match_Norm_Validation_Allele1', 'Match_Norm_Validation_Allele2',
-    'variant', 'Sequencing_Phase')
+keep_fields = c('Study', 'Hugo_Symbol', 'Entrez_Gene_Id', 'NCBI_Build',
+        'Chromosome', 'Start_position', 'End_position', 'Strand',
+        'Variant_Classification', 'Variant_Type',
+        'Reference_Allele', 'Tumor_Seq_Allele1', 'Tumor_Seq_Allele2',
+        'dbSNP_RS', 'dbSNP_Val_Status',
+        'Tumor_Sample_Barcode', 'Matched_Norm_Sample_Barcode',
+        'Match_Norm_Seq_Allele1', 'Match_Norm_Seq_Allele2',
+        'Mutation_Status', 'Sequence_Source', 'COSMIC_Codon',
+        'COSMIC_Gene', 'Transcript_Id', 'Exon', "ChromChange", 'AAChange')
 
 #' Read a single MAF file and return results
 #'
@@ -34,12 +34,10 @@ file2mut = function(fname, quiet=FALSE) {
     if (identical(re, NULL))
         warning("Failed: ", fname)
     else {
-        re$study = .b$grep("gdac.broadinstitute.org_([A-Z]+)", fname)
-
-        for (nn in keep_fields) {
-            if (!is.null(re[[nn]]))
-                re[[nn]] = as.character(re[[nn]])
-        }
+        re$Study = .b$grep("gdac.broadinstitute.org_([A-Z]+)", fname)
+        re = re[intersect(keep_fields, colnames(re))]
+        for (nn in intersect(keep_fields, colnames(re)))
+            re[[nn]] = as.character(re[[nn]])
     }
     re
 }
