@@ -39,8 +39,14 @@ mutated_genes = function(frequency=0, intogen=FALSE, tissue=NULL, drop=FALSE) {
 #' @return        A list of drivers per tissue
 drivers = function(tissue=NULL) {
     ig = .file$get('INTOGEN_DRIVERS')
-    if (!is.null(tissue))
+
+    if (!is.null(tissue)) {
+        if (tissue %in% c("COAD", "READ", "COADREAD"))
+            tissue = "COREAD"
+
         ig = dplyr::filter(ig, Tumor_Type %in% tissue)
+    }
+
     transmute(ig, HGNC=ActingDriver_Symbol, tissue=Tumor_Type)
 }
 
