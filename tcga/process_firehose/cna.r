@@ -20,8 +20,8 @@ file2cna = function(fname, quiet=FALSE) {
         message(fname)
 
     re = .io$read_table(fname, sep="\t", header=TRUE) %>%
-        tidyr::gather(key="Barcode", value="Gistic", -`Gene Symbol`, -`Locus ID`, -`Cytoband`) %>%
-        filter(Gistic != 0)
+        tidyr::gather(key="barcode", value="gistic", -`Gene Symbol`, -`Locus ID`, -Cytoband) %>%
+        filter(gistic != 0)
 }
 
 #' Process all GISTIC CNA files
@@ -37,8 +37,13 @@ cna = function(regex=archive_regex, dir=util$analyses_dir, save=NULL) {
 
     cna = lapply(clist, file2cna) %>%
         setNames(.b$grep("gdac.broadinstitute.org_([A-Z]+)", clist)) %>%
-        .df$add_name_col("Cohort", bind=TRUE) %>%
-        select(`Cohort`, `Barcode`, everything())
+        .df$add_name_col("cohort", bind=TRUE) %>%
+        transmute(cohort = cohort,
+                  barcode = barcode,
+                  hgnc = sub("\\|.*$", "", `Gene Symbol`),
+                  locus_id = `Locus ID`,
+                  cytoband = Cytoband,
+                  gistic = gistic)
 
     if (is.null(save))
         cna

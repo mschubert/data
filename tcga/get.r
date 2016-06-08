@@ -56,3 +56,11 @@ rppa = function(id_type="specimen") {
 mutations = function(id_type="specimen") {
     .p$load("tcga", "mutations.RData")
 }
+
+#' Get a data.frame listing all GISTIC scores for CNAs
+#'
+#' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
+#' @return         A data.frame with data for all the simple mutations
+cna = function(id_type="specimen") {
+    .p$load("tcga", "cna.RData")
+}
