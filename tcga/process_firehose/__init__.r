@@ -4,3 +4,4 @@ rna_seq2_voom = import('./rna_seq2_voom')$rna_seq2_voom
 mutations = import('./mutations')$mutations
 rppa = import('./rppa')$rppa
 cna = import('./cna')$cna
+cna_thresholded = import('./cna_thresholded')$cna_thresholded

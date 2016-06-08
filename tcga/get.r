@@ -64,3 +64,11 @@ mutations = function(id_type="specimen") {
 cna = function(id_type="specimen") {
     .p$load("tcga", "cna.RData")
 }
+
+#' Get a data.frame listing all GISTIC scores for CNAs
+#'
+#' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
+#' @return         A data.frame with data for all the simple mutations
+cna_thresholded = function(id_type="specimen") {
+    .p$load("tcga", "cna_thresholded.RData")
+}
