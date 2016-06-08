@@ -2,8 +2,8 @@
 # save into R objects for quicker loading
 .p = import('../../path')
 
-data_dir = .p$file("tcga", "stddata__2015_08_21")
-analyses_dir = .p$file("tcga", "analyses__2015_08_21")
+data_dir = .p$file("tcga", "stddata__2016_01_28")
+analyses_dir = .p$file("tcga", "analyses__2016_01_28")
 
 list_files = function(file_regex, dir=data_dir) {
     list.files(dir, pattern=file_regex, full.names=TRUE, recursive=TRUE)

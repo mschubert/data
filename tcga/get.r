@@ -23,7 +23,7 @@ tissues = function(id_type="specimen") {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame with data for all the clinical data
 clinical = function(tissue=NULL, id_type=NULL) {
-    re = .p$load("tcga", "clinical_full.RData")
+    re = .p$load("tcga", "clinical.RData")
     if (!is.null(tissue))
         re = dplyr::filter(re, study %in% tissue)
     if (!is.null(id_type))
