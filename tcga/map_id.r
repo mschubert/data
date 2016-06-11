@@ -57,14 +57,14 @@ map_id.matrix = function(obj, id_type=NULL, along=2, subset=NULL, drop=TRUE) {
     }
 }
 
-map_id.data.frame = function(obj, id_type=NULL, subset=NULL, along, drop=TRUE) {
+map_id.data.frame = function(obj, along, id_type=NULL, subset=NULL, drop=TRUE) {
     if (is.numeric(along))
         map_id.matrix(obj, id_type=id_type, subset=subset, along=along, drop=drop)
     else {
         ids = map_id(obj[[along]], id_type=id_type, subset=subset, drop=FALSE)
         keep = !is.na(ids)
 
-        obj[[along]] = map_id(obj[[along]])
+        obj[[along]] = ids
         if (drop)
             obj[keep,]
         else
@@ -73,15 +73,19 @@ map_id.data.frame = function(obj, id_type=NULL, subset=NULL, along, drop=TRUE) {
 }
 
 map_id.list = function(obj_list, ..., simplify=FALSE, USE.NAMES=TRUE) {
-    sapply(obj_list, function(x) map(x, ...), simplify=simplify, USE.NAMES=USE.NAMES)
+    sapply(obj_list, function(x) map_id(x, ...), simplify=simplify, USE.NAMES=USE.NAMES)
 }
 
 if (is.null(module_name())) {
     library(testthat)
 
     ids = c("TCGA-4Z-AA83-01A", "TCGA-4Z-AA83-01C")
-
     expect_equal(map_id(ids, subset="primary"), ids[1])
     expect_equal(map_id(ids, subset="primary", drop=FALSE), c(ids[1], NA))
     expect_equal(map_id(ids, id_type="patient"), substr(ids, 1,12))
+
+    idf = data.frame(idx=1:2, ids=ids)
+    expect_equal(map_id(idf, along="ids", subset="primary"), idf[1,,drop=FALSE])
+    expect_equal(map_id(idf, along="ids", subset="primary", drop=FALSE)$ids, c(ids[1], NA))
+    expect_equal(map_id(idf, along="ids", id_type="patient")$ids, substr(ids, 1,12))
 }
