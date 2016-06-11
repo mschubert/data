@@ -1,15 +1,6 @@
 .io = import('ebits/io')
 .p = import('../path')
-
-#' List all available ID types
-id_types = c("patient", "specimen", "full")
-.id_lengths = c(12, 16, 100)
-
-.make_id = function(obj, id_type, along=2) {
-    slen = setNames(.id_lengths, id_types)[id_type]
-    dimnames(obj)[[along]] = substr(dimnames(obj)[[along]], 1, slen)
-    obj
-}
+.barcode = import('./barcode')
 
 #' List all available tissues
 tissues = function(id_type="specimen") {
@@ -38,7 +29,7 @@ clinical = function(tissue=NULL, id_type=NULL) {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A matrix with HGNC symbols x TCGA samples
 rna_seq = function(tissue, id_type="specimen") {
-    .make_id(.p$load("tcga", paste0(tissue, "_voom.RData")), id_type)
+    .barcode$map(.p$load("tcga", paste0(tissue, "_voom.RData")), id_type=id_type)
 }
 
 #' Get a matrix for all RPPA measurements
@@ -46,7 +37,7 @@ rna_seq = function(tissue, id_type="specimen") {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A matrix with antibodies x TCGA samples
 rppa = function(id_type="specimen") {
-    .make_id(.p$load("tcga", "rppa.RData"), id_type)
+    .barcode$map(.p$load("tcga", "rppa.RData"), id_type=id_type)
 }
 
 #' Get a data.frame listing all mutations and types
@@ -54,7 +45,7 @@ rppa = function(id_type="specimen") {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame with data for all the simple mutations
 mutations = function(id_type="specimen") {
-    .p$load("tcga", "mutations.RData")
+    .barcode$map(.p$load("tcga", "mutations.RData"), id_type=id_type)
 }
 
 #' Get a data.frame listing all GISTIC scores for CNAs
@@ -62,7 +53,7 @@ mutations = function(id_type="specimen") {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame with data for all the simple mutations
 cna = function(id_type="specimen") {
-    .p$load("tcga", "cna.RData")
+    .barcode$map(.p$load("tcga", "cna.RData"), id_type=id_type)
 }
 
 #' Get a data.frame listing all GISTIC scores for CNAs
@@ -70,5 +61,5 @@ cna = function(id_type="specimen") {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame with data for all the simple mutations
 cna_thresholded = function(id_type="specimen") {
-    .p$load("tcga", "cna_thresholded.RData")
+    .barcode$map(.p$load("tcga", "cna_thresholded.RData"), id_type=id_type)
 }

@@ -2,7 +2,33 @@ library(dplyr)
 .io = import('ebits/io')
 .p = import('../path')
 
-# see https://tcga-data.nci.nih.gov/datareports/codeTablesReport.htm
+#' List all available ID types
+id_types = c("patient", "specimen", "full")
+
+#' Lengths of the respective ID types
+id_lengths = setNames(c(12, 16, 100), id_types)
+
+#' Maps barcodes to a specific identifier type
+map = function(obj, id_type, ...) UseMethod("map")
+
+map.character = function(obj, id_type, ...) {
+    substr(obj, 1, id_lengths[id_type])
+}
+
+map.array = function(obj, id_type, along=2) {
+    if (along == 1)
+        obj[map(rownames(obj)),]
+    else
+        obj[,map(colnames(obj))]
+}
+
+map.list = function(obj_list, ..., simplify=FALSE, USE.NAMES=TRUE) {
+        sapply(obj_list, function(x) map(x, ...), simplify=simplify, USE.NAMES=USE.NAMES)
+}
+
+#' List of code lookup tables
+#'
+#' see https://tcga-data.nci.nih.gov/datareports/codeTablesReport.htm
 codes = list(center_code = 'code_tables/center_code.txt',
              disease_study = 'code_tables/disease_study.txt',
              platform_code = 'code_tables/platform_code.txt',
@@ -15,10 +41,12 @@ codes = list(center_code = 'code_tables/center_code.txt',
            na.strings=NULL, colClasses='character', check.names=TRUE)
    })
 
-# eg. TCGA-02-0001-01
-#  TCGA - clinical centre - participant id - sample code
-# eg. TCGA-02-0001-01C-01D-0182-01
-#  (same as above)[D/R]NA,.. - 
+#' Regular expression to match TCGA barcodes
+#'
+#' eg. TCGA-02-0001-01
+#'  TCGA - clinical centre - participant id - sample code
+#' eg. TCGA-02-0001-01C-01D-0182-01
+#'  (same as above)[D/R]NA,.. - 
 regex_barcode = paste("^TCGA",              # TCGA identifer
                       "([a-zA-Z0-9]+)",     # tissue source site (eg. GBM from MBA)
                       "([a-zA-Z0-9]+)",     # participant id (4 digit alphanumeric)
@@ -28,8 +56,10 @@ regex_barcode = paste("^TCGA",              # TCGA identifer
                       "?([0-9]+)?$",        # centre (eg. 01=BROAD GCC)
                       sep = "-")
 
-# 32-bit random string
-# eg. ebf3e73f-41a0-4ca5-b608-fe1c629e16de
+#' Regular expression to match TCGA unique IDs
+#'
+#' 32-bit random string
+#' eg. ebf3e73f-41a0-4ca5-b608-fe1c629e16de
 regex_id = paste("[a-zA-Z0-9]{8}",
                  "[a-zA-Z0-9]{4}",
                  "[a-zA-Z0-9]{4}",
@@ -37,7 +67,7 @@ regex_id = paste("[a-zA-Z0-9]{8}",
                  "[a-zA-Z0-9]{12}",
                  sep = "-")
 
-# take a barcode and convert to data.frame w/ actual info
+#' Take a barcode and convert to data.frame w/ actual info
 barcode2index = function(ids) {
     m = stringr::str_match(ids, regex_barcode)
 
@@ -57,6 +87,7 @@ barcode2index = function(ids) {
                Sample.Definition = Definition)
 }
 
+#' Take a barcode and extract the study from it
 barcode2study = function(ids) {
     barcode2index(ids) %>%
         select(Study.Abbreviation) %>%
