@@ -57,7 +57,7 @@ map_id.matrix = function(obj, id_type=NULL, along=2, subset=NULL, drop=TRUE) {
     }
 }
 
-map_id.data.frame = function(obj, id_type=NULL, subset=NULL, along=1, drop=TRUE) {
+map_id.data.frame = function(obj, id_type=NULL, subset=NULL, along, drop=TRUE) {
     if (is.numeric(along))
         map_id.matrix(obj, id_type=id_type, subset=subset, along=along, drop=drop)
     else {
