@@ -48,7 +48,11 @@ rppa = function(id_type="specimen", ...) {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame with data for all the simple mutations
 mutations = function(id_type="specimen", ...) {
+    # 19k/22k in READ and all 20k OV have no portion in barcode, assuming 'A'
     .p$load("tcga", "mutations.RData") %>%
+        mutate(ifelse(nchar(Tumor_Sample_Barcode == 15),
+                      paste0(Tumor_Sample_Barcode, "A"),
+                      Tumor_Sample_Barcode)) %>%
         .map_id(id_type=id_type, ...)
 }
 
