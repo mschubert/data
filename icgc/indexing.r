@@ -2,8 +2,8 @@
 .io = import('ebits/io')
 .p = import('../path')
 
-.icgc_data_dir = .p$path('icgc')
-.icgc_raw_dir = .p$file('icgc', 'version_17')
+.icgc_data_dir = module_file('cache')
+.icgc_raw_dir = module_file('data', 'version_17')
 .data_cache = list()
 .name_cache = list()
 

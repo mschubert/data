@@ -2,9 +2,6 @@
 .ar = import('ebits/array')
 .io = import('ebits/io')
 .i = import('./indexing')
-.p = import('../path')
-
-.icgc_data_dir = .p$path('icgc')
 
 #' Returns a list containing row- and column names for clinical data
 #TODO: give index=, infer id type from it
