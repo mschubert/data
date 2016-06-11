@@ -1,3 +1,3 @@
 export_submodule('./barcode')
 export_submodule('./get')
-export_submodule('./only_primary')
+export_submodule('./map_id')

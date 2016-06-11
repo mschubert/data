@@ -2,30 +2,6 @@ library(dplyr)
 .io = import('ebits/io')
 .p = import('../path')
 
-#' List all available ID types
-id_types = c("patient", "specimen", "full")
-
-#' Lengths of the respective ID types
-id_lengths = setNames(c(12, 16, 100), id_types)
-
-#' Maps barcodes to a specific identifier type
-map = function(obj, id_type, ...) UseMethod("map")
-
-map.character = function(obj, id_type, ...) {
-    substr(obj, 1, id_lengths[id_type])
-}
-
-map.array = function(obj, id_type, along=2) {
-    if (along == 1)
-        obj[map(rownames(obj)),]
-    else
-        obj[,map(colnames(obj))]
-}
-
-map.list = function(obj_list, ..., simplify=FALSE, USE.NAMES=TRUE) {
-        sapply(obj_list, function(x) map(x, ...), simplify=simplify, USE.NAMES=USE.NAMES)
-}
-
 #' List of code lookup tables
 #'
 #' see https://tcga-data.nci.nih.gov/datareports/codeTablesReport.htm
