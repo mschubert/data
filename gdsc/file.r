@@ -1,4 +1,4 @@
-.p = import('../path')
+.io = import('ebits/io')
 
 .files = list(
     MASTER_LIST = "20140320_MASTER_LIST.ro",
@@ -12,4 +12,4 @@
     NGS_BEM = "NGS_BEM_COSMIC_NURIAS_26022014.ro"
 )
 
-get = function(id) .p$load('gdsc', .files[[id]])
+get = function(id) .io$load(module_file('data', .files[[id]], mustWork=TRUE))

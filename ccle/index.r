@@ -3,9 +3,12 @@
 .ar = import('ebits/array')
 .df = import('ebits/data_frame')
 .gdsc = import('../gdsc')
-.p = import('../path')
 
-index = .p$read("ccle", "CCLE_sample_info_file_2012-10-18.txt", header=TRUE)
+.exists = function(...) !is.na(module_file(...))
+.file = function(...) file.path(module_file(), ...)
+.read = function(...) io$read(module_file(..., mustWork=TRUE))
+
+index = .read("data", "CCLE_sample_info_file_2012-10-18.txt", header=TRUE)
 index$COSMIC = .gdsc$cosmic$name2id(index$Cell.line.primary.name, warn=FALSE)
 
 #' Returns a gene expression matrix (genes x COSMIC IDs)
@@ -14,16 +17,16 @@ index$COSMIC = .gdsc$cosmic$name2id(index$Cell.line.primary.name, warn=FALSE)
 #' @return            The expression matrix
 basal_expression = function(index_type="COSMIC") {
     fname = "CCLE_Expression.Arrays_2013-03-18"
-    if (!.p$exists("ccle", fname, ext=".RData")) {
+    if (!.exists("cache", fname, ext=".RData")) {
         warning("data file does not exist, creating raw .CEL files")
         ma = import('ebits/process/microarray')
         fnames = list.files(fname, full.names=TRUE)
         expr = oligo::read.celfiles(fnames) %>%
             ma$normalize() %>%
             ma$annotate("hgnc_symbol")
-        save(expr, file=.p$file("ccle", fname, ext=".RData"))
+        save(expr, file=.file("cache", fname, ext=".RData"))
     } else
-        expr = .p$load("ccle", paste0(fname, ".RData"))
+        expr = .io$load(.file("cache", fname, ".RData"))
 
     expr = Biobase::exprs(expr)
     cn = .b$match(sub(".CEL$", "", colnames(expr)),
@@ -50,7 +53,7 @@ basal_expression = function(index_type="COSMIC") {
 #' @return            The drug response matrix
 drug_response = function(index_type="COSMIC", map_drugs=TRUE) {
     idx = select_(index, "CCLE.name", index=index_type)
-    re = .p$read("ccle", "CCLE_NP24.2009_Drug_data_2015.02.24.csv", header=TRUE) %>%
+    re = .read("data", "CCLE_NP24.2009_Drug_data_2015.02.24.csv", header=TRUE) %>%
         select(CCLE.name=CCLE.Cell.Line.Name, Compound, IC50=IC50..uM.) %>%
         .df$update(idx, match_cols="CCLE.name") %>%
         na.omit() %>%
