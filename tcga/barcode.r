@@ -32,6 +32,18 @@ regex_barcode = paste("^TCGA",              # TCGA identifer
                       "?([0-9]+)?$",        # centre (eg. 01=BROAD GCC)
                       sep = "-")
 
+#' Returns a logical whether the argument is a TCGA barcode
+is_barcode = function(x, len=0) {
+    grepl(regex_barcode, x) & nchar(x) >= len
+}
+
+#' Makes sure the vector argument is all barcode
+must_barcode = function(x, len=0) {
+    ibc = is_barcode(x, len)
+    if (!all(ibc))
+        stop("Is not a ", len, "+ char barcode: ", paste(x[!ibc], sep=", "))
+}
+
 #' Regular expression to match TCGA unique IDs
 #'
 #' 32-bit random string

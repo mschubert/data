@@ -19,8 +19,7 @@ map_id.character = function(obj, id_type=NULL, subset=NULL, drop=TRUE, ...) {
     if (!is.null(subset) && ! subset %in% subset_types)
         stop("Invalid subset. Choose one of: ", paste(subset_types, sep=", "))
 
-    if (any(sapply(obj, function(x) nchar(x) < 16)))
-        stop("IDs too short for at least one case")
+    .barcode$must_barcode(obj, 16)
 
     if (!is.null(subset))
         keep = substr(obj, 14, 16) == subset_ids[subset]
