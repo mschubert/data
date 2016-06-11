@@ -1,6 +1,5 @@
 library(dplyr)
 .io = import('ebits/io')
-.p = import('../path')
 
 #' List of code lookup tables
 #'
