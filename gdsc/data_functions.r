@@ -1,5 +1,6 @@
 library(dplyr)
 .b = import('ebits/base')
+.io = import('ebits/io')
 .ar = import('ebits/array')
 .file = import('./file')
 cosmic = import('./cosmic')
@@ -52,11 +53,20 @@ drivers = function(tissue=NULL) {
 
 #' Returns a gene expression matrix
 #'
-#' @return  A matrix with (genes x cell lines)
-basal_expression = function() {
-    obj = .file$get('BASAL_EXPRESSION')
-    rownames(obj$DATA) = obj$GENE_SYMBOLS
-    obj$DATA[rownames(obj$DATA) != "",]
+#' @param probes      Whether to return an expression values for each probe [FALSE]
+#' @param duplicated  Allow two arrays for the same cell line [defunct; TRUE]
+#' @return            A matrix with (genes x cell lines)
+basal_expression = function(probes=FALSE, duplicated=FALSE) {
+    if (probes) {
+        expr_set = .io$load(module_file("cache", "expr_probes.RData", mustWork=TRUE))
+        re = Biobase::exprs(expr_set)
+        colnames(re) = cosmic$name2id(Biobase::pData(expr_set)$Characteristics.cell.line., warn=FALSE)
+        re[,!duplicated(colnames(re))]
+    } else {
+        obj = .file$get('BASAL_EXPRESSION')
+        rownames(obj$DATA) = obj$GENE_SYMBOLS
+        obj$DATA[rownames(obj$DATA) != "",]
+    }
 }
 
 #' Returns a drug response matrix using the filters specified

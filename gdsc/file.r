@@ -12,4 +12,4 @@
     NGS_BEM = "NGS_BEM_COSMIC_NURIAS_26022014.ro"
 )
 
-get = function(id) .io$load(module_file('data', .files[[id]], mustWork=TRUE))
+get = function(id) .io$load(module_file('cache', .files[[id]], mustWork=TRUE))
