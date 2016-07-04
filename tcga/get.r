@@ -53,7 +53,7 @@ mutations = function(id_type="specimen", ...) {
     # 19k/22k in READ and all 20k OV have no portion in barcode, assuming 'A'
     .load("cache", "mutations.RData") %>%
         mutate(Tumor_Sample_Barcode =
-                ifelse(nchar(Tumor_Sample_Barcode == 15),
+                ifelse(nchar(Tumor_Sample_Barcode) == 15,
                        paste0(Tumor_Sample_Barcode, "A"),
                        Tumor_Sample_Barcode)) %>%
         .map_id(id_type=id_type, along="Tumor_Sample_Barcode", ...)
