@@ -22,13 +22,13 @@ codes = list(center_code = 'code_tables/center_code.txt',
 #'  TCGA - clinical centre - participant id - sample code
 #' eg. TCGA-02-0001-01C-01D-0182-01
 #'  (same as above)[D/R]NA,.. - 
-regex_barcode = paste("^TCGA",              # TCGA identifer
-                      "([a-zA-Z0-9]+)",     # tissue source site (eg. GBM from MBA)
-                      "([a-zA-Z0-9]+)",     # participant id (4 digit alphanumeric)
-                      "([0-9]+)([A-Z])?"  , # tumor/normal id, number of vial
-                      "?([0-9]+)?([A-Z])?", # portion (numbered); analyte (eg. [D/R]NA)
-                      "?([a-zA-Z0-9]+)?",   # plate id (4 digit alphanumeric)
-                      "?([0-9]+)?$",        # centre (eg. 01=BROAD GCC)
+regex_barcode = paste("^TCGA",                # TCGA identifer
+                      "([a-zA-Z0-9]{2})",     # tissue source site (eg. GBM from MBA)
+                      "([a-zA-Z0-9]{4})",     # participant id (4 digit alphanumeric)
+                      "([0-9]{2})([A-Z])?",   # tumor/normal id, number of vial
+                      "?([0-9]{2})?([A-Z])?", # portion (numbered); analyte (eg. [D/R]NA)
+                      "?([a-zA-Z0-9]{4})?",   # plate id (4 digit alphanumeric)
+                      "?([0-9]+)?$",          # centre (eg. 01=BROAD GCC)
                       sep = "-")
 
 #' Returns a logical whether the argument is a TCGA barcode
@@ -80,4 +80,18 @@ barcode2study = function(ids) {
         select(Study.Abbreviation) %>%
         unlist() %>%
         setNames(ids)
+}
+
+
+if (is.null(module_name())) {
+    library(testthat)
+    expect_true(is_barcode("TCGA-OR-A5J1-01A-11D-A29I-10"))
+    expect_true(is_barcode("TCGA-OR-A5J1-01A-11D-A29I"))
+    expect_true(is_barcode("TCGA-OR-A5J1-01A-11D"))
+    expect_true(is_barcode("TCGA-OR-A5J1-01A"))
+    expect_true(is_barcode("TCGA-OR-A5J1-01"))
+
+    expect_false(is_barcode("TCGA-OR-A5J1-01A-11D-A29I-10A"))
+    expect_false(is_barcode("TCGA-OR-A5J1-01A-11D-A29IA"))
+    expect_false(is_barcode("TCGA-OR-A5J1-01", 16))
 }
