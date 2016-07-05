@@ -70,8 +70,8 @@ targets = function() {
 
     DRUG_PROPS %>%
         filter(QC_DRUG == "P") %>%
-        transmute(id = as.character(DRUG_ID),
-                  name = as.character(DRUG_NAME),
+        transmute(drug = as.character(DRUG_NAME),
+                  id = as.character(DRUG_ID),
                   type = unname(lookup[as.character(DRUG_TYPE)]),
                   synonyms = as.character(SYNONYMS),
                   brand_name = as.character(BRAND_NAME),
