@@ -5,11 +5,11 @@
 .gdsc = import('../gdsc')
 
 .exists = function(...) !is.na(module_file(...))
-.file = function(...) file.path(module_file(), ...)
-.read = function(...) io$read(module_file(..., mustWork=TRUE))
+.file = function(...) .io$file_path(module_file(), ...)
+.read = function(..., header=TRUE) .io$read_table(module_file(..., mustWork=TRUE), header=header)
 
 index = .read("data", "CCLE_sample_info_file_2012-10-18.txt", header=TRUE)
-index$COSMIC = .gdsc$cosmic$name2id(index$Cell.line.primary.name, warn=FALSE)
+index$COSMIC = .gdsc$cosmic$name2id(index$`Cell line primary name`, warn=FALSE)
 
 #' Returns a gene expression matrix (genes x COSMIC IDs)
 #'
@@ -26,20 +26,20 @@ basal_expression = function(index_type="COSMIC") {
             ma$annotate("hgnc_symbol")
         save(expr, file=.file("cache", fname, ext=".RData"))
     } else
-        expr = .io$load(.file("cache", fname, ".RData"))
+        expr = .io$load(.file("cache", fname, ext=".RData"))
 
     expr = Biobase::exprs(expr)
-    cn = .b$match(sub(".CEL$", "", colnames(expr)),
-                  from = index$Expression.arrays,
-                  to = index[[index_type]])
+#    cn = .b$match(sub(".CEL$", "", colnames(expr)),
+#                  from = index$`Expression arrays`,
+#                  to = index[[index_type]])
     
-    colnames(expr) = unname(cn)
-    nas = is.na(cn)
-    if (any(nas)) {
-        warning("dropping ", sum(nas), " identifiers for ", index_type, " mapping")
-        expr = expr[,!nas]
-        cn = cn[!nas]
-    }
+#    colnames(expr) = unname(cn)
+#    nas = is.na(cn)
+#    if (any(nas)) {
+#        warning("dropping ", sum(nas), " identifiers for ", index_type, " mapping")
+#        expr = expr[,!nas]
+#        cn = cn[!nas]
+#    }
 
     expr
 }
