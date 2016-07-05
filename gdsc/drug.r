@@ -58,3 +58,41 @@ conc = function(type="max", names=NULL, ids=NULL, log=TRUE, ...) {
     conc = setNames(CONC[[paste0(toupper(type), field)]], mapping)
     setNames(conc[query], query)
 }
+
+#' Returns a data.frame with drug ID and name, and the target classes
+#'
+#' @return  The data.frame
+targets = function() {
+    lookup = setNames(c("targeted", "cytotoxic"),
+                      c("targetted", "cytotoxic"))
+
+    fac2int = function(x) as.integer(as.character(x))
+
+    DRUG_PROPS %>%
+        filter(QC_DRUG == "P") %>%
+        transmute(id = as.character(DRUG_ID),
+                  name = as.character(DRUG_NAME),
+                  type = unname(lookup[as.character(DRUG_TYPE)]),
+                  synonyms = as.character(SYNONYMS),
+                  brand_name = as.character(BRAND_NAME),
+                  target = as.character(PUTATIVE_TARGET),
+                  p53 = fac2int(p53.pathway),
+                  egfr = fac2int(EGFR.signaling),
+                  mapk_erk = fac2int(ERK.MAPK.signaling),
+                  pi3k = fac2int(PI3K.signaling),
+                  mtor = fac2int(TOR.signaling),
+                  rtk = fac2int(RTK.signaling),
+                  wnt = fac2int(WNT.signaling),
+                  igfr = fac2int(IGFR.signaling),
+                  abl = fac2int(ABL.signaling),
+                  jnk_p38 = fac2int(JNK.and.p38.signaling),
+                  metabolism = fac2int(metabolism),
+                  dna_replication = fac2int(DNA.replication),
+                  cell_cycle = fac2int(cell.cycle),
+                  mitosis = fac2int(mitosis),
+                  cytoskeleton = fac2int(cytoskeleton),
+                  genome_integrity = fac2int(Genome.integrity),
+                  chromatin_histone = fac2int(chromatin..histone.methylation),
+                  chromatin_other = fac2int(chromatin..other),
+                  other = fac2int(other))
+}
