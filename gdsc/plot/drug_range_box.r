@@ -1,14 +1,15 @@
-.b = import('base')
-.ar = import('array')
-.drug = import('../drug')
-.data = import('../data_functions')
+plt = import('ebits/plot')
+b = import('ebits/base')
+ar = import('ebits/array')
+drug = import('../drug')
+data = import('../data_functions')
 
-.tissues = .data$tissues(minN=15)
-.Ys = .data$drug_response('IC50s')
-.ar$intersect(.tissues, .Ys, along=1)
+tissues15 = data$tissues(minN=15)
+Ys = data$drug_response('IC50s')
+ar$intersect(tissues15, Ys, along=1)
 
-.min_conc = .drug$conc('min', colnames(.Ys), log=TRUE)
-.max_conc = .drug$conc('max', colnames(.Ys), log=TRUE)
+min_conc = drug$conc('min', colnames(Ys), log=TRUE)
+max_conc = drug$conc('max', colnames(Ys), log=TRUE)
 
 #' Plots boxplots for a drug and different tissues
 #'
@@ -21,9 +22,9 @@
 #' @param tissues     Tissue vector, with COSMIC IDs as names
 #' @param plot_range  Plot the range the drug was screened in
 #' @param plot_only   Character vector of tissues that should be included in comparison
-drug_range_box = function(drug, stratify=NULL, min_n=5, tissues=.tissues,
+drug_range_box = function(drug, stratify=NULL, min_n=5, tissues=tissues15,
                           plot_range=TRUE, plot_only=unique(tissues)) {
-    mydf = data.frame(tissue=tissues, cosmic = names(tissues), drug=.Ys[,drug]) %>%
+    mydf = data.frame(tissue=tissues, cosmic = names(tissues), drug=Ys[,drug]) %>%
         na.omit() %>%
         group_by(tissue) %>%
         filter(n() >= min_n) %>%
@@ -63,8 +64,8 @@ drug_range_box = function(drug, stratify=NULL, min_n=5, tissues=.tissues,
         }
     }
 
-    minc = .min_conc[drug]
-    maxc = .max_conc[drug]
+    minc = min_conc[drug]
+    maxc = max_conc[drug]
     rect = data.frame(xmin=-Inf, xmax=Inf, ymin=minc, ymax=maxc)
 
     all_strats = unique(sapply(stratify, names))
