@@ -23,8 +23,8 @@ filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL, blood
         cancer=NULL, tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE) {
 
     args = as.list(.b$match_call_defaults())[-1]
-#    args$x = x[]
-#    x[] = NULL
+    args$x = x[[args[[2]]]]
+    args[[2]] = NULL
     x[do.call(filter, args),]
 }
 
@@ -109,6 +109,16 @@ if (is.null(module_file())) {
     # if we want normals this should be all false
     expect_warning(empty <- filter(tumors, normal=TRUE))
     expect_equal(empty, setNames(rep(FALSE, length(tumors)), tumors))
+
+    # matrix functions
+    tmat = matrix(1:30, nrow=10, ncol=3, dimnames=list(tumors, NULL))
+    r1 = filter(tmat, tissue="SKCM")
+    expect_equal(unique(.bc$barcode2study(rownames(r1))), "SKCM")
+
+    # data.frame functions
+    tdf = data.frame(barcode = tumors, a="a", b=5)
+    r2 = filter(tdf, "barcode", tissue="SKCM")
+    expect_equal(unique(.bc$barcode2study(r2$barcode)), "SKCM")
 
     normals = c("TCGA-39-5021-11A", "TCGA-55-7726-10A-01D", "TCGA-JY-A6FA-10A-01D",
         "TCGA-26-5134-10A", "TCGA-D1-A0ZS-10A", "TCGA-FW-A3R5-11A-11D",
