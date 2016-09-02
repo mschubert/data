@@ -110,15 +110,12 @@ if (is.null(module_file())) {
     expect_warning(empty <- filter(tumors, normal=TRUE))
     expect_equal(empty, setNames(rep(FALSE, length(tumors)), tumors))
 
-    # matrix functions
+    # matrix, data.frame functions
     tmat = matrix(1:30, nrow=10, ncol=3, dimnames=list(tumors, NULL))
-    r1 = filter(tmat, tissue="SKCM")
-    expect_equal(unique(.bc$barcode2study(rownames(r1))), "SKCM")
-
-    # data.frame functions
     tdf = data.frame(barcode = tumors, a="a", b=5)
-    r2 = filter(tdf, "barcode", tissue="SKCM")
-    expect_equal(unique(.bc$barcode2study(r2$barcode)), "SKCM")
+    expect_equal(rownames(filter(tmat, tissue="SKCM")),
+                 filter(tdf, "barcode", tissue="SKCM")$barcode,
+                 names(filter(tumors, tissue="SKCM")))
 
     normals = c("TCGA-39-5021-11A", "TCGA-55-7726-10A-01D", "TCGA-JY-A6FA-10A-01D",
         "TCGA-26-5134-10A", "TCGA-D1-A0ZS-10A", "TCGA-FW-A3R5-11A-11D",
