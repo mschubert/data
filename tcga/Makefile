@@ -11,3 +11,9 @@ firehose: data
 # download using the firehose tool
 data:
 	;
+
+data/PrimTum_MoBEM_PanCan.tsv:
+	wget -N -P data http://www.cancerrxgene.org/gdsc1000/GDSC1000_WebResources//Data/BEMs/PrimaryTumours/PrimTum_MoBEM_PanCan.tsv
+
+cache/BEM.RData: data/PrimTum_MoBEM_PanCan.tsv
+	Rscript bem.r $^ $@	
