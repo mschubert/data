@@ -1,7 +1,7 @@
 # read raw data from .txt.gz files
 # save into R objects for quicker loading
-data_dir = module_file("data", "stddata__2016_01_28")
-analyses_dir = module_file("data", "analyses__2016_01_28")
+data_dir = module_file("..", "data", "stddata__2016_01_28", mustWork=TRUE)
+analyses_dir = module_file("..", "data", "analyses__2016_01_28", mustWork=TRUE)
 
 #' Finds files that match a regular expression
 #'
@@ -9,7 +9,7 @@ analyses_dir = module_file("data", "analyses__2016_01_28")
 #' @param regex  A regular expression to match files
 #' @return       A character vector of matched files
 list_files = function(dir, regex) {
-    list.files(dir, pattern=tar_regex, full.names=TRUE, recursive=TRUE)
+    list.files(dir, pattern=regex, full.names=TRUE, recursive=TRUE)
 }
 
 #' Unpacks a Firehose archive and returns the directory
