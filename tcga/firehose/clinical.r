@@ -1,8 +1,8 @@
 # read raw data from .txt.gz files
 # save into R objects for quicker loading
 library(dplyr)
-.b = import('ebits/base')
-.io = import('ebits/io')
+b = import('ebits/base')
+io = import('ebits/io')
 util = import('./util')
 
 #' Regular expression for RPPA files
@@ -17,7 +17,7 @@ file2clinical = function(fname, quiet=FALSE) {
     if (!quiet)
         message(fname)
 
-    ff = t(.io$read_table(fname, sep="\t", quote=""))
+    ff = t(io$read_table(fname, sep="\t", quote=""))
     colnames(ff) = ff[1,]
     ff = ff[-1,]
     ff = as.data.frame(ff)
@@ -42,7 +42,7 @@ clinical = function(regex=archive_regex, dir=util$data_dir) {
     cdata = lapply(clist, function(...) try(file2clinical(...)))
     cdata = cdata[sapply(cdata, class) != "try-error"]
 
-    cnames = do.call(.b$intersect, lapply(cdata, colnames))
+    cnames = do.call(b$intersect, lapply(cdata, colnames))
     cc = do.call(rbind, lapply(cdata, function(x) x[,cnames]))
     rownames(cc) = 1:nrow(cc)
 

@@ -1,9 +1,9 @@
 # read raw data from .txt.gz files
 # save into R objects for quicker loading
 library(dplyr)
-.b = import('ebits/base')
-.io = import('ebits/io')
-.df = import('data_frame')
+b = import('ebits/base')
+io = import('ebits/io')
+df = import('data_frame')
 util = import('./util')
 
 #' Regular expression for CNA files
@@ -18,7 +18,7 @@ file2cna = function(fname, quiet=FALSE) {
     if (!quiet)
         message(fname)
 
-    re = .io$read_table(fname, sep="\t", header=TRUE) %>%
+    re = io$read_table(fname, sep="\t", header=TRUE) %>%
         tidyr::gather(key="barcode", value="gistic", -`Gene Symbol`, -`Locus ID`, -Cytoband) %>%
         filter(gistic != 0)
 }
@@ -35,8 +35,8 @@ cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir) {
         util$select("all_thresholded.by_genes\\.txt")
 
     cna = lapply(clist, file2cna) %>%
-        setNames(.b$grep("gdac.broadinstitute.org_([A-Z]+)", clist)) %>%
-        .df$add_name_col("cohort", bind=TRUE) %>%
+        setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", clist)) %>%
+        df$add_name_col("cohort", bind=TRUE) %>%
         transmute(cohort = cohort,
                   barcode = barcode,
                   hgnc = sub("\\|.*$", "", `Gene Symbol`),

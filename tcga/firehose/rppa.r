@@ -1,9 +1,9 @@
 # read raw data from .txt.gz files
 # save into R objects for quicker loading
 library(dplyr)
-.b = import('ebits/base')
-.io = import('ebits/io')
-.ar = import('ebits/array')
+#b = import('ebits/base')
+io = import('ebits/io')
+ar = import('ebits/array')
 util = import('./util')
 
 #' Regular expression for RPPA files
@@ -18,7 +18,7 @@ file2rppa = function(fname, quiet=FALSE) {
     if (!quiet)
         message(fname)
 
-    re = .io$read_table(fname, header=TRUE)
+    re = io$read_table(fname, header=TRUE)
     mat = data.matrix(re[,-1])
     rownames(mat) = re[,1]
     mat
@@ -37,8 +37,8 @@ rppa = function(regex=archive_regex, dir=util$data_dir) {
 
     rppa = elist %>%
         lapply(file2rppa) %>%
-#        setNames(.b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)) %>%
-        .ar$stack( along=2)
+#        setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)) %>%
+        ar$stack( along=2)
 
     rppa
 }

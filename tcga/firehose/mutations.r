@@ -1,9 +1,8 @@
 # read raw data from .txt.gz files
 # save into R objects for quicker loading
 library(dplyr)
-.b = import('ebits/base')
-.io = import('ebits/io')
-.ar = import('ebits/array')
+b = import('ebits/base')
+io = import('ebits/io')
 util = import('./util')
 
 #' Regular expression for MAF files
@@ -29,11 +28,11 @@ file2mut = function(fname, quiet=FALSE) {
     if (!quiet)
         message(fname)
 
-    re = .io$read_table(fname, header=TRUE, quote="") %catch% NULL
+    re = io$read_table(fname, header=TRUE, quote="") %catch% NULL
     if (identical(re, NULL))
         warning("Failed: ", fname)
     else {
-        re$Study = .b$grep("gdac.broadinstitute.org_([A-Z]+)", fname)
+        re$Study = b$grep("gdac.broadinstitute.org_([A-Z]+)", fname)
         re = re[intersect(keep_fields, colnames(re))]
         for (nn in intersect(keep_fields, colnames(re)))
             re[[nn]] = as.character(re[[nn]])
