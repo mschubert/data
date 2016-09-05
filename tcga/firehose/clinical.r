@@ -32,7 +32,6 @@ file2clinical = function(fname, quiet=FALSE) {
 #'
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
-#' @param save   File name to save results to (NULL: return)
 #' @return       Clinical data.frame if save is NULL
 clinical = function(regex=archive_regex, dir=util$data_dir) {
     clist = util$list_files(dir, regex) %>%

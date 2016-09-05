@@ -28,7 +28,6 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
 #'
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
-#' @param save   File name to save results to (NULL: return)
 #' @return       Expression matrix if save is NULL
 rna_seq_voom = function(regex=archive_regex, dir=util$data_dir) {
     expr = util$list_files(dir, regex) %>%

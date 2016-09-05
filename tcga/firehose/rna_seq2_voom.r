@@ -3,7 +3,6 @@
 library(dplyr)
 b = import('ebits/base')
 io = import('ebits/io')
-#ar = import('ebits/array')
 util = import('./util')
 
 #' Regular expression for RNA seq v2 files
@@ -30,7 +29,6 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
 #'
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
-#' @param save   File name to save results to (NULL: return)
 #' @return       Expression matrix if save is NULL
 rna_seq2_voom = function(regex=archive_regex, dir=util$data_dir) {
     elist = util$list_files(dir, regex) %>%
@@ -38,8 +36,7 @@ rna_seq2_voom = function(regex=archive_regex, dir=util$data_dir) {
         util$list_files("rnaseqv2")
     
     expr = elist %>%
-        lapply(file2expr) #%>%
-#        ar$stack(along=2, fun.aggregate=mean) #TODO: see which sample + how to handle
+        lapply(file2expr)
 
     names = b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)
 

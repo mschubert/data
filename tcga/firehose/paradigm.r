@@ -30,7 +30,6 @@ file2paradigm = function(fname, quiet=FALSE) {
 #'
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
-#' @param save   File name to save results to (NULL: return)
 #' @return       PARADIGM score matrix if save is NULL
 paradigm = function(regex=archive_regex, dir=util$analyses_dir) {
     elist = util$list_files(dir, regex) %>%

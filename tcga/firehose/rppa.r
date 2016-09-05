@@ -28,7 +28,6 @@ file2rppa = function(fname, quiet=FALSE) {
 #'
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
-#' @param save   File name to save results to (NULL: return)
 #' @return       Protein matrix if save is NULL
 rppa = function(regex=archive_regex, dir=util$data_dir) {
     elist = util$list_files(dir, regex) %>%
