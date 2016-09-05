@@ -54,6 +54,4 @@ mutations = function(regex=archive_regex, dir=util$data_dir) {
     mut = elist %>%
         lapply(file2mut) %>%
         bind_rows()
-
-    mut
 }

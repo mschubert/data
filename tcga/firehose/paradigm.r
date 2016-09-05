@@ -45,6 +45,4 @@ paradigm = function(regex=archive_regex, dir=util$analyses_dir) {
         lapply(file2paradigm) %>%
 #        setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)) %>%
         ar$stack( along=2)
-
-    paradigm
 }

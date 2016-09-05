@@ -43,6 +43,4 @@ cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir) {
                   locus_id = `Locus ID`,
                   cytoband = Cytoband,
                   gistic = gistic)
-
-    cna
 }

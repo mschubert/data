@@ -39,6 +39,4 @@ rppa = function(regex=archive_regex, dir=util$data_dir) {
         lapply(file2rppa) %>%
 #        setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)) %>%
         ar$stack( along=2)
-
-    rppa
 }

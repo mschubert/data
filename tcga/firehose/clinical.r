@@ -45,6 +45,5 @@ clinical = function(regex=archive_regex, dir=util$data_dir) {
     cnames = do.call(b$intersect, lapply(cdata, colnames))
     cc = do.call(rbind, lapply(cdata, function(x) x[,cnames]))
     rownames(cc) = 1:nrow(cc)
-
     cc
 }
