@@ -1,20 +1,5 @@
 library(dplyr)
-.io = import('ebits/io')
-
-#' List of code lookup tables
-#'
-#' see https://tcga-data.nci.nih.gov/datareports/codeTablesReport.htm
-codes = list(center_code = 'code_tables/center_code.txt',
-             disease_study = 'code_tables/disease_study.txt',
-             platform_code = 'code_tables/platform_code.txt',
-             sample_type = 'code_tables/sample_type.txt',
-             tissue_source_site = 'code_tables/tissue_source_site.txt',
-             portion_analyte = 'code_tables/portion_analyte.txt') %>%
-   lapply(function(x) {
-       fname = file.path(module_file(), x)
-       .io$read_table(fname, header=TRUE, quote=NULL,
-           na.strings=NULL, colClasses='character', check.names=TRUE)
-   })
+.codes = import('./code_tables')
 
 #' Regular expression to match TCGA barcodes
 #'
@@ -67,9 +52,9 @@ barcode2index = function(ids) {
                       Analyte = m[,7],
                       Plate.ID = m[,8],
                       Analysis.Center = m[,9]) %>%
-        left_join(codes$tissue_source_site, by="TSS.Code") %>%
-        left_join(codes$sample_type, by="Code") %>%
-        left_join(codes$disease_study, by="Study.Name") %>%
+        left_join(.codes$tissue_source_site, by="TSS.Code") %>%
+        left_join(.codes$sample_type, by="Code") %>%
+        left_join(.codes$disease_study, by="Study.Name") %>%
         rename(Sample.Code = Code,
                Sample.Definition = Definition)
 }
