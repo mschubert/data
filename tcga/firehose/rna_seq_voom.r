@@ -31,15 +31,12 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
 #' @param dir    Directory for archive dirs
 #' @param save   File name to save results to (NULL: return)
 #' @return       Expression matrix if save is NULL
-rna_seq_voom = function(regex=archive_regex, dir=util$data_dir, save=NULL) {
+rna_seq_voom = function(regex=archive_regex, dir=util$data_dir) {
     elist = util$list_files(regex, util$data_dir) %>%
         util$unpack() %>%
         util$select("[^2]\\.mRNAseq_raw_counts\\.txt") %>%
         lapply(file2expr) %>%
         .ar$stack(along=2)
 
-    if (is.null(save))
-        elist
-    else
-        .io$h5save(elist, file=.path$file("tcga", save))
+    elist
 }

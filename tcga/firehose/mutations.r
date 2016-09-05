@@ -4,7 +4,6 @@ library(dplyr)
 .b = import('ebits/base')
 .io = import('ebits/io')
 .ar = import('ebits/array')
-.p = import('../../path')
 util = import('./util')
 
 #' Regular expression for MAF files
@@ -48,7 +47,7 @@ file2mut = function(fname, quiet=FALSE) {
 #' @param dir    Directory for archive dirs
 #' @param save   File name to save results to (NULL: return)
 #' @return       Mutation matrix if save is NULL
-mutations = function(regex=archive_regex, dir=util$data_dir, save=NULL) {
+mutations = function(regex=archive_regex, dir=util$data_dir) {
     elist = util$list_files(regex, dir) %>%
         util$unpack() %>%
         util$select("\\.maf\\.txt")
@@ -57,8 +56,5 @@ mutations = function(regex=archive_regex, dir=util$data_dir, save=NULL) {
         lapply(file2mut) %>%
         bind_rows()
 
-    if (is.null(save))
-        mut
-    else
-        save(mut, file=.p$file("tcga", save))
+    mut
 }

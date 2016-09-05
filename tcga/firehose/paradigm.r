@@ -4,7 +4,6 @@ library(dplyr)
 .b = import('ebits/base')
 .io = import('ebits/io')
 .ar = import('ebits/array')
-.p = import('../../path')
 util = import('./util')
 
 #' Regular expression for PARADIGM files
@@ -33,7 +32,7 @@ file2paradigm = function(fname, quiet=FALSE) {
 #' @param dir    Directory for archive dirs
 #' @param save   File name to save results to (NULL: return)
 #' @return       PARADIGM score matrix if save is NULL
-paradigm = function(regex=archive_regex, dir=util$analyses_dir, save=NULL) {
+paradigm = function(regex=archive_regex, dir=util$analyses_dir) {
     elist = util$list_files(regex, dir) %>%
         util$unpack() %>%
         util$select("inferredPathwayLevels\\.tab")
@@ -47,8 +46,5 @@ paradigm = function(regex=archive_regex, dir=util$analyses_dir, save=NULL) {
 #        setNames(.b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)) %>%
         .ar$stack( along=2)
 
-    if (is.null(save))
-        paradigm
-    else
-        base::save(paradigm, file=.p$file("tcga", file))
+    paradigm
 }

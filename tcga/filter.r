@@ -56,7 +56,7 @@ filter.default = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=
     if (!is.null(vial)) {
         if (is.character(vial))
             keep = keep & fields$Vial == vial
-        if (is.numeric(vial))
+        else if (is.numeric(vial))
             stop("not implemented")
         else
             stop("Invalid 'vial': ", vial)

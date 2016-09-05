@@ -4,7 +4,6 @@ library(dplyr)
 .b = import('ebits/base')
 .io = import('ebits/io')
 .df = import('data_frame')
-.p = import('../../path')
 util = import('./util')
 
 #' Regular expression for CNA files
@@ -30,7 +29,7 @@ file2cna = function(fname, quiet=FALSE) {
 #' @param dir    Directory for archive dirs
 #' @param save   File name to save results to (NULL: return)
 #' @return       Clinical data.frame if save is NULL
-cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir, save=NULL) {
+cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir) {
     clist = util$list_files(regex, dir) %>%
         util$unpack() %>%
         util$select("all_thresholded.by_genes\\.txt")
@@ -45,8 +44,5 @@ cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir, save=NULL
                   cytoband = Cytoband,
                   gistic = gistic)
 
-    if (is.null(save))
-        cna
-    else
-        save(cna, file=.p$file("tcga", save))
+    cna
 }

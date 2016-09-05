@@ -3,7 +3,6 @@
 library(dplyr)
 .b = import('ebits/base')
 .io = import('ebits/io')
-.p = import('../../path')
 util = import('./util')
 
 #' Regular expression for RPPA files
@@ -35,7 +34,7 @@ file2clinical = function(fname, quiet=FALSE) {
 #' @param dir    Directory for archive dirs
 #' @param save   File name to save results to (NULL: return)
 #' @return       Clinical data.frame if save is NULL
-clinical = function(regex=archive_regex, dir=util$data_dir, save=NULL) {
+clinical = function(regex=archive_regex, dir=util$data_dir) {
     clist = util$list_files(regex, dir) %>%
         util$unpack() %>%
         util$select("clin\\.merged\\.txt")
@@ -47,8 +46,5 @@ clinical = function(regex=archive_regex, dir=util$data_dir, save=NULL) {
     cc = do.call(rbind, lapply(cdata, function(x) x[,cnames]))
     rownames(cc) = 1:nrow(cc)
 
-    if (is.null(save))
-        cc
-    else
-        save(cc, file=.p$file("tcga", save))
+    cc
 }
