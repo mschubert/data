@@ -35,9 +35,9 @@ file2clinical = function(fname, quiet=FALSE) {
 #' @param save   File name to save results to (NULL: return)
 #' @return       Clinical data.frame if save is NULL
 clinical = function(regex=archive_regex, dir=util$data_dir) {
-    clist = util$list_files(regex, dir) %>%
+    clist = util$list_files(dir, regex) %>%
         util$unpack() %>%
-        util$select("clin\\.merged\\.txt")
+        util$list_files("clin\\.merged\\.txt")
 
     cdata = lapply(clist, function(...) try(file2clinical(...)))
     cdata = cdata[sapply(cdata, class) != "try-error"]

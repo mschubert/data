@@ -33,9 +33,9 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
 #' @param save   File name to save results to (NULL: return)
 #' @return       Expression matrix if save is NULL
 rna_seq2_voom = function(regex=archive_regex, dir=util$data_dir) {
-    elist = util$list_files(regex, util$data_dir) %>%
+    elist = util$list_files(dir, regex) %>%
         util$unpack() %>%
-        util$select("rnaseqv2")
+        util$list_files("rnaseqv2")
     
     expr = elist %>%
         lapply(file2expr) #%>%

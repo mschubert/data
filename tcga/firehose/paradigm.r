@@ -33,9 +33,9 @@ file2paradigm = function(fname, quiet=FALSE) {
 #' @param save   File name to save results to (NULL: return)
 #' @return       PARADIGM score matrix if save is NULL
 paradigm = function(regex=archive_regex, dir=util$analyses_dir) {
-    elist = util$list_files(regex, dir) %>%
+    elist = util$list_files(dir, regex) %>%
         util$unpack() %>%
-        util$select("inferredPathwayLevels\\.tab")
+        util$list_files("inferredPathwayLevels\\.tab")
 
     elist = elist[-4] # remove GBM, duplicate w/ GBMLGG
     elist = elist[-5] # remove KIPAN, duplicate w/ other kidney

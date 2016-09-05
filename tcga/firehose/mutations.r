@@ -47,9 +47,9 @@ file2mut = function(fname, quiet=FALSE) {
 #' @param save   File name to save results to (NULL: return)
 #' @return       Mutation matrix if save is NULL
 mutations = function(regex=archive_regex, dir=util$data_dir) {
-    elist = util$list_files(regex, dir) %>%
+    elist = util$list_files(dir, regex) %>%
         util$unpack() %>%
-        util$select("\\.maf\\.txt")
+        util$list_files("\\.maf\\.txt")
 
     mut = elist %>%
         lapply(file2mut) %>%

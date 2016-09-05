@@ -31,9 +31,9 @@ file2rppa = function(fname, quiet=FALSE) {
 #' @param save   File name to save results to (NULL: return)
 #' @return       Protein matrix if save is NULL
 rppa = function(regex=archive_regex, dir=util$data_dir) {
-    elist = util$list_files(regex, util$data_dir) %>%
+    elist = util$list_files(dir, regex) %>%
         util$unpack() %>%
-        util$select("\\.rppa\\.txt")
+        util$list_files("\\.rppa\\.txt")
 
     rppa = elist %>%
         lapply(file2rppa) %>%

@@ -30,9 +30,9 @@ file2cna = function(fname, quiet=FALSE) {
 #' @param save   File name to save results to (NULL: return)
 #' @return       Clinical data.frame if save is NULL
 cna = function(regex=archive_regex, dir=util$analyses_dir) {
-    clist = util$list_files(regex, dir) %>%
+    clist = util$list_files(dir, regex) %>%
         util$unpack() %>%
-        util$select("focal_data_by_genes\\.txt")
+        util$list_files("focal_data_by_genes\\.txt")
 
     cna = lapply(clist, file2cna) %>%
         setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", clist)) %>%
