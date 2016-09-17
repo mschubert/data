@@ -56,7 +56,7 @@ rna_seq = function(tissue, id_type="specimen", ...) {
 #' @return         A matrix with antibodies x TCGA samples
 rppa = function(id_type="specimen", ...) {
     .load("cache", "rppa.RData") %>%
-        .map_id(id_type=id_type, ...)
+        .map_id(id_type=id_type, along=1, ...)
 }
 
 #' Get a data.frame listing all mutations and types
@@ -88,5 +88,5 @@ cna = function(id_type="specimen", ...) {
 #' @return         A data.frame with data for all the simple mutations
 cna_thresholded = function(id_type="specimen", ...) {
     .load("cache", "cna_thresholded.RData") %>%
-        .map_id(id_type=id_type, ...)
+        .map_id(id_type=id_type, along="barcode", ...)
 }
