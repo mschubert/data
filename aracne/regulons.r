@@ -1,5 +1,3 @@
-import('ebits/base/operators')
-
 #' Returns a data.frame with ARACNe regulons
 #'
 #' This respects the principles of clean data, unlike the package
@@ -9,6 +7,8 @@ import('ebits/base/operators')
 #' @param hgnc        Map Ensembl genes to HGNC symbols (default: FALSE)
 #' @return            A list (or data_frame) or regulons
 regulons = function(tissue=NULL, data_frame=TRUE, hgnc=FALSE) {
+    `%>%` = magrittr::`%>%`
+
     data = new.env()
     avail = data(package="aracne.networks")$results[, "Item"]
     if (!is.null(tissue))
@@ -29,8 +29,15 @@ regulons = function(tissue=NULL, data_frame=TRUE, hgnc=FALSE) {
     reg = sapply(data, regulon2df, simplify=FALSE, USE.NAMES=TRUE) %>%
         data.table::rbindlist(idcol="tissue")
 
+    # maybe do this in original regulons so we keep the object
+    # for VIPER (or similar) analysis
     if (hgnc) {
+        idmap = import('ebits/process/idmap')
+
         stop("not implemented")
+#        r2 = reg %>%
+#            mutate(regulator = .idmap$gene(regulator),
+#                   target = .idmap$gene(target))
     } else {
         reg
     }
