@@ -1,4 +1,4 @@
-library(dplyr)
+`%>%` = magrittr::`%>%`
 .codes = import('./code_tables')
 
 #' Regular expression to match TCGA barcodes
@@ -52,17 +52,17 @@ barcode2index = function(ids) {
                       Analyte = m[,7],
                       Plate.ID = m[,8],
                       Analysis.Center = m[,9]) %>%
-        left_join(.codes$tissue_source_site, by="TSS.Code") %>%
-        left_join(.codes$sample_type, by="Code") %>%
-        left_join(.codes$disease_study, by="Study.Name") %>%
-        rename(Sample.Code = Code,
-               Sample.Definition = Definition)
+        dplyr::left_join(.codes$tissue_source_site, by="TSS.Code") %>%
+        dplyr::left_join(.codes$sample_type, by="Code") %>%
+        dplyr::left_join(.codes$disease_study, by="Study.Name") %>%
+        dplyr::rename(Sample.Code = Code,
+                      Sample.Definition = Definition)
 }
 
 #' Take a barcode and extract the study from it
 barcode2study = function(ids) {
     barcode2index(ids) %>%
-        select(Study.Abbreviation) %>%
+        dplyr::select(Study.Abbreviation) %>%
         unlist() %>%
         setNames(ids)
 }
