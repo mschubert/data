@@ -1,4 +1,4 @@
-library(dplyr)
+`%>%` = magrittr::`%>%`
 .io = import('ebits/io')
 .bc = import('./barcode')
 .map_id = import('./map_id')$map_id
@@ -33,6 +33,7 @@ clinical = function(tissue=NULL, id_type=NULL) {
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A matrix with HGNC symbols x TCGA samples
 rna_seq = function(tissue, id_type="specimen", ...) {
+    library(methods) # required; otherwise h5 error
 #    .load("cache", paste0(tissue, "_voom.RData")) %>%
 #        .map_id(id_type=id_type, ...)
     file = h5::h5file(module_file("cache", "rna_seq2_voom.h5"), mode="r")
@@ -46,8 +47,7 @@ rna_seq = function(tissue, id_type="specimen", ...) {
     colnames(data) = file["col"][]
 
     h5::h5close(file)
-    t(data) %>%
-        .map_id(id_type=id_type, ...)
+    .map_id(t(data), id_type=id_type, ...)
 }
 
 #' Get a matrix for all RPPA measurements
@@ -66,10 +66,10 @@ rppa = function(id_type="specimen", ...) {
 mutations = function(id_type="specimen", ...) {
     # 19k/22k in READ and all 20k OV have no portion in barcode, assuming 'A'
     .load("cache", "mutations.RData") %>%
-        mutate(Tumor_Sample_Barcode =
-                ifelse(nchar(Tumor_Sample_Barcode) == 15,
-                       paste0(Tumor_Sample_Barcode, "A"),
-                       Tumor_Sample_Barcode)) %>%
+        dplyr::mutate(Tumor_Sample_Barcode =
+                      ifelse(nchar(Tumor_Sample_Barcode) == 15,
+                             paste0(Tumor_Sample_Barcode, "A"),
+                             Tumor_Sample_Barcode)) %>%
         .map_id(id_type=id_type, along="Tumor_Sample_Barcode", ...)
 }
 
