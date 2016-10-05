@@ -25,7 +25,7 @@ is_barcode = function(x, len=0) {
 must_barcode = function(x, len=0) {
     ibc = is_barcode(x, len)
     if (!all(ibc))
-        stop("Is not a ", len, "+ char barcode: ", collapse(x[!ibc], sep=", "))
+        stop("Is not a ", len, "+ char barcode: ", paste(x[!ibc], collapse=", "))
 }
 
 #' Regular expression to match TCGA unique IDs
