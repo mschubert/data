@@ -9,7 +9,7 @@ MASTER_LIST = cosmic$MASTER_LIST
 DRUG_PROPS = drug$DRUG_PROPS
 
 #' Returns a binary event matrix (BEM) for mutated genes
-ngs_bem = function() {
+bem = function() {
     .file$get('NGS_BEM_FATHMM_29052013v2.ro')
 }
 
