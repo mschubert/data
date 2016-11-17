@@ -10,7 +10,7 @@ DRUG_PROPS = drug$DRUG_PROPS
 
 #' Returns a binary event matrix (BEM) for mutated genes
 bem = function() {
-    .file$get('NGS_BEM_FATHMM_29052013v2.ro')
+    t(.io$load(module_file("cache", "BEMs", 'PANCAN_simple_MOBEM.rdata', mustWork=TRUE)))
 }
 
 #' Returns a matrix of frequency- and intogen-filtered mutated genes
