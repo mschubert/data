@@ -13,7 +13,12 @@ bc = import('./barcode')
 intersect = function(..., along=1, envir=parent.frame()) {
     dots = pryr$named_dots(...)
 	objs = setNames(lapply(dots, function(x) eval(x, envir=envir)), names(dots))
-    all_bc = unlist(ar$dimnames(objs, along=along))
+    all_bc = unlist(lapply(objs, function(x) {
+        if (is.vector(x) && is.null(names(x)))
+            x
+        else
+            ar$dimnames(x, along=along)
+    }))
     bc$must_barcode(all_bc)
     min_len = min(nchar(all_bc))
 
@@ -41,16 +46,23 @@ intersect = function(..., along=1, envir=parent.frame()) {
 if (is.null(module_name())) {
     library(testthat)
 
-    dn = list(c('TCGA-OR-A5J1-01A','TCGA-OR-A5J2-01A'),c('TCGA-OR-A5J2','TCGA-OR-A5J1-01A-11D'))
+    dn = list(c('TCGA-OR-A5J1-01A','TCGA-OR-A5J2-01A'),
+              c('TCGA-OR-A5J2','TCGA-OR-A5J1-01A-11D'))
     a = setNames(1:2, rev(dn[[1]]))
     A = t(matrix(1:4, nrow=2, ncol=2, dimnames=dn))
     DF = structure(list(y=3:4, z=c(6,5), x=1:2, A=dn[[1]]),
             .Names=c("y","z","x","A"), row.names=1:2, class="data.frame")
 
 	a1 = a
+    DF2 = DF
 	intersect(a1, A, along=1)
 	expect_equal(names(a1), rownames(A))
+	intersect(a1, DF2$A)
+	expect_equal(names(a1), DF2$A)
 
-	intersect(a1, DF$A)
-	expect_equal(names(a1), DF$A)
+    # check min_len also takes into account DF$A
+    DF3 = DF2
+    a2 = setNames(1:2, dn[[1]])
+	intersect(a2, DF3$A)
+	expect_equal(names(a2), DF3$A)
 }
