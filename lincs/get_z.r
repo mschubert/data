@@ -14,8 +14,13 @@ get_z = function(cid, rid=probes$landmarks, map_genes=FALSE) {
     fname = module_file("data", "zspc_n1328098x22268.gctx", mustWork=TRUE)
     re = parse_gctx(fname=fname, cid=cid, rid=rid)
 
-    if (is.character(map_genes)) {
+    if (!identical(map_genes, FALSE)) {
         annot = import('./probe_annotations')$probe_annotations()
+
+        if (! map_genes %in% colnames(annot))
+            stop(map_genes, " not found in annotation mapping (available: ",
+                 paste(colnames(annot), collapse=", "), ")")
+
         mapped = b$match(rownames(re),
                          from = annot$affy_hg_u133_plus_2,
                          to = annot[[map_genes]])
@@ -37,4 +42,6 @@ if (is.null(module_name())) {
     z2 = get_z(cid, map_genes="hgnc_symbol")
     expect_equal(colnames(z2), cid)
     expect_lt(nrow(z2), nrow(z))
+
+    z3 = get_z(cid, rid=probes$projected, map_genes="hgnc_symbol")
 }
