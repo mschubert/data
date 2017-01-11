@@ -1,3 +1,4 @@
+b = import('ebits/base')
 ar = import('ebits/array')
 probes = import('./probes')
 parse_gctx = import('./parse_gctx')$parse_gctx
@@ -15,8 +16,12 @@ get_z = function(cid, rid=probes$landmarks, map_genes=FALSE) {
 
     if (is.character(map_genes)) {
         annot = import('./probe_annotations')$probe_annotations()
-        ar$summarize(re, along=1, from="affy_hg_u133_plus_2", to=map_genes,
-                     data=annot, FUN=function(x) mean(x, na.rm=TRUE))
+        mapped = b$match(rownames(re),
+                         from = annot$affy_hg_u133_plus_2,
+                         to = annot[[map_genes]])
+        rownames(re) = unname(mapped)
+        re = re[!is.na(rownames(re)),,drop=FALSE]
+        limma::avereps(re)
     } else
         re
 }
@@ -24,12 +29,12 @@ get_z = function(cid, rid=probes$landmarks, map_genes=FALSE) {
 if (is.null(module_name())) {
     library(testthat)
 
-    id = "ASG001_MCF7_24H_X1_B7_DUO52HI53LO:G13"
-    z = get_z(id)
-    expect_equal(colnames(z), id)
+    cid = "ASG001_MCF7_24H_X1_B7_DUO52HI53LO:G13"
+    z = get_z(cid)
+    expect_equal(colnames(z), cid)
 #    expect_equal(rownames(z), probes$landmarks) # 978 vs 977?
 
-    z2 = get_z(id, map_genes="hgnc_symbol")
-    expect_equal(colnames(z2), id)
+    z2 = get_z(cid, map_genes="hgnc_symbol")
+    expect_equal(colnames(z2), cid)
     expect_lt(nrow(z2), nrow(z))
 }
