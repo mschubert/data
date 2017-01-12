@@ -3,7 +3,12 @@ ar = import('ebits/array')
 probes = import('./probes')
 parse_gctx = import('./parse_gctx')$parse_gctx
 
-#' Returns z-scores for a subset of experiments
+#' Returns expression values for a subset of experiments
+#'
+#' Inference using deep neural networks, as in this articicle:
+#' https://doi.org/10.1093/bioinformatics/btw074
+#' Data downloaded from:
+#' https://cbcl.ics.uci.edu/public_data/D-GEX/l1000_n1328098x22268.gctx 
 #'
 #' @param cid        Vector of experiment IDs to subset
 #' @param rid        Vector of probe IDs to subset
@@ -11,7 +16,7 @@ parse_gctx = import('./parse_gctx')$parse_gctx
 #'                   identifiers are: hgnc_symbol, hgnc_id, entrezgene,
 #'                   ensembl_gene_id, ensembl_transcript_id
 expr = function(cid, rid=probes$landmarks, map_genes=FALSE) {
-    fname = module_file("data", "q2norm_n1328098x22268.gctx", mustWork=TRUE)
+    fname = module_file("data", "l1000_1328098x22268.gctx", mustWork=TRUE)
     re = parse_gctx(fname=fname, cid=cid, rid=rid)
 
     if (!identical(map_genes, FALSE)) {
