@@ -16,7 +16,7 @@ parse_gctx = import('./parse_gctx')$parse_gctx
 #'                   identifiers are: hgnc_symbol, hgnc_id, entrezgene,
 #'                   ensembl_gene_id, ensembl_transcript_id
 expr = function(cid, rid=probes$landmarks, map_genes=FALSE) {
-    fname = module_file("data", "l1000_1328098x22268.gctx", mustWork=TRUE)
+    fname = module_file("data", "l1000_n1328098x22268.gctx", mustWork=TRUE)
     re = parse_gctx(fname=fname, cid=cid, rid=rid)
 
     if (!identical(map_genes, FALSE)) {
