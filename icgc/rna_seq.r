@@ -1,4 +1,5 @@
 idx = import('./indexing')
+pu = import('./process_util')
 
 #' Function to retrieve the RNA seq data from the processed ICGC object
 #'

@@ -1,9 +1,11 @@
+config = import('./config')
+
 mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
-    if (!force && file.exists(file.path(icgc_data_dir, fname)))
+    if (!force && file.exists(file.path(config$cached_data, fname)))
         return()
 
     idmap = import('ebits/process/idmap')
-    efiles = list.files(icgc_raw_dir, regex, recursive=T, full.names=T)
+    efiles = list.files(config$raw_data, regex, recursive=T, full.names=T)
 
     file2matrix = function(fname) {
         message(fname)
@@ -22,23 +24,23 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
 
     mat = t(.ar$stack(obj, along=2, fill=0))
     if (grepl("\\.h5$", fname))
-        h5store::h5save(mat, file=file.path(icgc_data_dir, fname))
+        h5store::h5save(mat, file=file.path(config$cached_data, fname))
     else
-        save(mat, file=file.path(icgc_data_dir, fname))
+        save(mat, file=file.path(config$cached_data, fname))
 }
 
 df = function(fname, regex, transform=function(x) x, force=FALSE) {
-    if (!force && file.exists(file.path(icgc_data_dir, fname)))
+    if (!force && file.exists(file.path(config$cached_data, fname)))
         return()
 
-    files = list.files(icgc_raw_dir, regex, recursive=TRUE, full.names=TRUE)
+    files = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
     mat = do.call(rbind, lapply(files, function(f) cbind(
         study = b$grep("/([^/]+)/[^/]+$", f),
         read.table(f, header=TRUE, sep="\t") #FIXME: io$read should work here
     ))) %>% transform()
 
     if (grepl("\\.h5$", fname))
-        h5store::h5save(mat, file=file.path(icgc_data_dir, fname))
+        h5store::h5save(mat, file=file.path(config$cached_data, fname))
     else
-        save(mat, file=file.path(icgc_data_dir, fname))
+        save(mat, file=file.path(config$cached_data, fname))
 }
