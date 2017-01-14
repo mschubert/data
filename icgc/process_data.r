@@ -6,7 +6,7 @@ config = import('./config')
 #' @param force  Overwrite existing files instead of skipping
 rna_seq = function(force=FALSE) {
     util$mat("expr_seq_raw.h5", '^exp_seq',
-        raw_read_count ~ gene_id + icgc_sample_id, map.hgnc=TRUE, force=force)
+        raw_read_count ~ gene_id + icgc_sample_id, map.hgnc=FALSE, force=force)
 
 #    util$mat("expr_seq_norm.h5", '^exp_seq',
 #        normalized_read_count ~ gene_id + icgc_sample_id, map.hgnc=TRUE, force=force)
@@ -16,7 +16,6 @@ rna_seq = function(force=FALSE) {
         expr = limma::voom(expr)$E
         h5store::h5save(t(expr), file=voomfile)
     }
-
 }
 
 clinical = function(force=FALSE) {
