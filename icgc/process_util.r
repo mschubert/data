@@ -1,14 +1,13 @@
 config = import('./config')
-io = import('ebits/io')
 ar = import('ebits/array')
 
-mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
+mat = function(regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
     if (!force && file.exists(file.path(config$cached_data, fname)))
         return()
 
-    idmap = import('ebits/process/idmap')
     efiles = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
     efiles = efiles[file.size(efiles) > 0]
+    idmap = import('ebits/process/idmap')
 
     file2matrix = function(fname) {
         message(fname)
@@ -25,8 +24,7 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
     if (length(obj) == 0)
         stop("all file reads failed, something is wrong")
 
-    mat = t(ar$stack(obj, along=2, fill=0)) #TODO: check if saving the right t()
-    io$save(mat, file=file.path(config$cached_data, fname))
+    mat = ar$stack(obj, along=2) #TODO: check if saving the right t()
 }
 
 df = function(fname, regex, transform=function(x) x, force=FALSE) {
@@ -38,6 +36,4 @@ df = function(fname, regex, transform=function(x) x, force=FALSE) {
         study = b$grep("/([^/]+)/[^/]+$", f),
         data.table::fread(paste('zcat', f), header=TRUE, sep="\t")
     ))) %>% transform()
-
-    io$save(mat, file=file.path(config$cached_data, fname))
 }
