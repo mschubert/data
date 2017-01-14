@@ -1,4 +1,5 @@
 config = import('./config')
+io = import('ebits/io')
 ar = import('ebits/array')
 
 mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
@@ -11,7 +12,7 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
 
     file2matrix = function(fname) {
         message(fname)
-        mat = ar$construct(read.table(fname, header=TRUE, sep="\t"),
+        mat = ar$construct(data.table::fread(paste('zcat', fname), header=TRUE, sep="\t"),
                            formula = formula,
                            fun.aggregate=fun.aggregate)
         mat = mat[!rownames(mat) %in% c('?',''),] # aggr fun might handle his?
@@ -24,11 +25,8 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
     if (length(obj) == 0)
         stop("all file reads failed, something is wrong")
 
-    mat = t(ar$stack(obj, along=2, fill=0))
-    if (grepl("\\.h5$", fname))
-        h5store::h5save(mat, file=file.path(config$cached_data, fname))
-    else
-        save(mat, file=file.path(config$cached_data, fname))
+    mat = t(ar$stack(obj, along=2, fill=0)) #TODO: check if saving the right t()
+    io$save(mat, file=file.path(config$cached_data, fname))
 }
 
 df = function(fname, regex, transform=function(x) x, force=FALSE) {
@@ -38,11 +36,8 @@ df = function(fname, regex, transform=function(x) x, force=FALSE) {
     files = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
     mat = do.call(rbind, lapply(files, function(f) cbind(
         study = b$grep("/([^/]+)/[^/]+$", f),
-        read.table(f, header=TRUE, sep="\t") #FIXME: io$read should work here
+        data.table::fread(paste('zcat', f), header=TRUE, sep="\t")
     ))) %>% transform()
 
-    if (grepl("\\.h5$", fname))
-        h5store::h5save(mat, file=file.path(config$cached_data, fname))
-    else
-        save(mat, file=file.path(config$cached_data, fname))
+    io$save(mat, file=file.path(config$cached_data, fname))
 }

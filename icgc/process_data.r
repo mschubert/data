@@ -1,5 +1,6 @@
 util = import('./process_util')
 config = import('./config')
+io = import('ebits/io')
 
 #' Process rna_seq data
 #'
