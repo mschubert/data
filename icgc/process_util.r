@@ -1,15 +1,17 @@
 config = import('./config')
+ar = import('ebits/array')
 
 mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
     if (!force && file.exists(file.path(config$cached_data, fname)))
         return()
 
     idmap = import('ebits/process/idmap')
-    efiles = list.files(config$raw_data, regex, recursive=T, full.names=T)
+    efiles = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
+    efiles = efiles[file.size(efiles) > 0]
 
     file2matrix = function(fname) {
         message(fname)
-        mat = .ar$construct(read.table(fname, header=T, sep="\t"),
+        mat = ar$construct(read.table(fname, header=TRUE, sep="\t"),
                            formula = formula,
                            fun.aggregate=fun.aggregate)
         mat = mat[!rownames(mat) %in% c('?',''),] # aggr fun might handle his?
@@ -22,7 +24,7 @@ mat = function(fname, regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate
     if (length(obj) == 0)
         stop("all file reads failed, something is wrong")
 
-    mat = t(.ar$stack(obj, along=2, fill=0))
+    mat = t(ar$stack(obj, along=2, fill=0))
     if (grepl("\\.h5$", fname))
         h5store::h5save(mat, file=file.path(config$cached_data, fname))
     else
