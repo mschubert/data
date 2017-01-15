@@ -7,7 +7,7 @@ io = import('ebits/io')
 #' @param force  Overwrite existing files instead of skipping
 rna_seq = function(force=FALSE) {
     expr = util$mat('^exp_seq',
-        raw_read_count ~ gene_id + icgc_sample_id, map.hgnc=TRUE, force=force)
+        raw_read_count ~ gene_id + icgc_sample_id, map.hgnc=TRUE)
 
     io$save(t(expr), file=file.path(config$cached_data, "expr_seq_raw.gctx"))
 

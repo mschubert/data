@@ -1,10 +1,7 @@
 config = import('./config')
 ar = import('ebits/array')
 
-mat = function(regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
-    if (!force && file.exists(file.path(config$cached_data, fname)))
-        return()
-
+mat = function(regex, formula, map.hgnc=FALSE, fun.aggregate=sum) {
     efiles = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
     efiles = efiles[file.size(efiles) > 0]
     idmap = import('ebits/process/idmap')
@@ -27,10 +24,7 @@ mat = function(regex, formula, map.hgnc=FALSE, force=FALSE, fun.aggregate=sum) {
     mat = ar$stack(obj, along=2) #TODO: check if saving the right t()
 }
 
-df = function(fname, regex, transform=function(x) x, force=FALSE) {
-    if (!force && file.exists(file.path(config$cached_data, fname)))
-        return()
-
+df = function(fname, regex, transform=function(x) x) {
     files = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
     mat = do.call(rbind, lapply(files, function(f) cbind(
         study = b$grep("/([^/]+)/[^/]+$", f),
