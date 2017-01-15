@@ -1,20 +1,25 @@
 util = import('./process_util')
 config = import('./config')
 io = import('ebits/io')
+ar = import('ebits/array')
 
 #' Process rna_seq data
 #'
 #' @param force  Overwrite existing files instead of skipping
 rna_seq = function(force=FALSE) {
-    expr = util$mat('^exp_seq',
-        raw_read_count ~ gene_id + icgc_sample_id, map.hgnc=TRUE)
+    files = util$list_files("^exp_seq")
+    exprs = util$get_matrix(files,
+                            raw_read_count ~ gene_id + icgc_sample_id,
+                            map.hgnc=TRUE)
 
-    io$save(t(expr), file=file.path(config$cached_data, "expr_seq_raw.gctx"))
+    io$save(t(ar$stack(exprs, along=2)),
+            file=file.path(config$cached_data, "expr_seq_raw.gctx"))
 
     voomfile = file.path(config$cached_data, "expr_seq_voom.gctx")
     if (identical(force, TRUE) || !file.exists(voomfile)) {
-        expr = limma::voom(expr)$E
-        io$save(t(expr), file=voomfile)
+        exprs = lapply(exprs, function(e) limma::voom(e)$E)
+        io$save(t(ar$stack(exprs, along=2)),
+                file=voomfile)
     }
 }
 

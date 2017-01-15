@@ -1,14 +1,28 @@
 config = import('./config')
-ar = import('ebits/array')
 
-mat = function(regex, formula, map.hgnc=FALSE, fun.aggregate=sum) {
+list_files = function(regex) {
     efiles = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
     efiles = efiles[file.size(efiles) > 0]
+    efiles
+}
+
+read_files = function(fnames) {
+    read_file = function(fname)
+        data.table::fread(paste('zcat', fname), header=TRUE, sep="\t")
+
+    if (length(fnames) == 1)
+        read_file(fnames)
+    else
+        lapply(fnames, read_file)
+}
+
+get_matrix = function(fnames, formula, map.hgnc=FALSE, fun.aggregate=sum) {
+    ar = import('ebits/array')
     idmap = import('ebits/process/idmap')
 
     file2matrix = function(fname) {
         message(fname)
-        mat = ar$construct(data.table::fread(paste('zcat', fname), header=TRUE, sep="\t"),
+        mat = ar$construct(read_files(fname),
                            formula = formula,
                            fun.aggregate=fun.aggregate)
         mat = mat[!rownames(mat) %in% c('?',''),] # aggr fun might handle his?
@@ -16,18 +30,10 @@ mat = function(regex, formula, map.hgnc=FALSE, fun.aggregate=sum) {
             mat = idmap$gene(mat, to='hgnc_symbol', summarize=fun.aggregate)
         mat
     }
-    obj = lapply(efiles, file2matrix)
+    objs = lapply(fnames, file2matrix)
 
-    if (length(obj) == 0)
+    if (length(objs) == 0)
         stop("all file reads failed, something is wrong")
 
-    mat = ar$stack(obj, along=2) #TODO: check if saving the right t()
-}
-
-df = function(fname, regex, transform=function(x) x) {
-    files = list.files(config$raw_data, regex, recursive=TRUE, full.names=TRUE)
-    mat = do.call(rbind, lapply(files, function(f) cbind(
-        study = b$grep("/([^/]+)/[^/]+$", f),
-        data.table::fread(paste('zcat', f), header=TRUE, sep="\t")
-    ))) %>% transform()
+    objs
 }
