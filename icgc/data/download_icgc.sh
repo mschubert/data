@@ -15,7 +15,7 @@ URL=https://dcc.icgc.org/api/v1/download?fn=
 RELEASE=23
 
 summary=(
-    donor.all_projects.tsv.g
+    donor.all_projects.tsv.gz
     donor_biomarker.all_projects.tsv.gz
     donor_exposure.all_projects.tsv.gz
     donor_family.all_projects.tsv.gz
