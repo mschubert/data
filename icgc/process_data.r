@@ -1,3 +1,4 @@
+library(dplyr)
 util = import('./process_util')
 config = import('./config')
 io = import('ebits/io')
@@ -24,11 +25,12 @@ rna_seq = function(force=FALSE) {
 }
 
 clinical = function(force=FALSE) {
-    tfun = function(x) mutate(x, tissue = .b$grep("^(\\w+)", project_code))
-    df1 = util$df("clinical.RData", "clinical\\.", transform=tfun, force=force)
-    df2 = util$df("clinicalsample.RData", "clinicalsample\\.", force=force)
+    files = util$list_files("^donor\\.")
+    clinical = util$read_files(files) %>%
+        data.table::rbindlist() %>%
+        as_data_frame()
 
-    io$save(df1, file=file.path(config$cached_data, fname))
+    io$save(clinical, file=file.path(config$cached_data, "clinical.RData"))
 }
 
 mutations = function(force=FALSE) {
