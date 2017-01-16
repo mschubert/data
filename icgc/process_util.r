@@ -8,7 +8,8 @@ list_files = function(regex) {
 
 read_files = function(fnames) {
     read_file = function(fname)
-        data.table::fread(paste('zcat', fname), header=TRUE, sep="\t")
+        data.table::fread(paste('zcat', fname), header=TRUE, sep="\t",
+                          integer64='double')
 
     if (length(fnames) == 1)
         read_file(fnames)
