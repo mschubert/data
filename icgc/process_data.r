@@ -33,6 +33,12 @@ clinical = function(force=FALSE) {
     io$save(clinical, file=file.path(config$cached_data, "clinical.RData"))
 }
 
+specimen = function(force=FALSE) {
+    fname = file.path(config$raw_data, "Summary/donor.all_projects.tsv.gz")
+    specimen = util$read_files(fname)
+    io$save(specimen, file=file.path(config$cached_data, "specimen.RData"))
+}
+
 mutations = function(force=FALSE) {
     mut_aggr = function(x) {
         any(x != 0)
