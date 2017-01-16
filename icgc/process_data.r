@@ -10,7 +10,7 @@ ar = import('ebits/array')
 rna_seq = function(force=FALSE) {
     files = util$list_files("^exp_seq")
     exprs = util$get_matrix(files,
-                            raw_read_count ~ gene_id + icgc_sample_id,
+                            raw_read_count ~ gene_id + icgc_specimen_id,
                             map.hgnc=TRUE)
 
     io$save(t(ar$stack(exprs, along=2)),
