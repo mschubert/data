@@ -1,8 +1,8 @@
-library(dplyr)
 util = import('./process_util')
 config = import('./config')
 io = import('ebits/io')
 ar = import('ebits/array')
+rnaseq = import('ebits/process/rna-seq')
 
 #' Process rna_seq data
 #'
@@ -16,9 +16,13 @@ rna_seq = function() {
     io$save(t(ar$stack(exprs, along=2)),
             file=file.path(config$cached_data, "expr_seq_raw.gctx"))
 
-    exprs = lapply(exprs, function(e) limma::voom(e)$E)
-    io$save(t(ar$stack(exprs, along=2)),
+    transformed = rnaseq$voom(exprs)
+    io$save(t(ar$stack(transformed, along=2)),
             file=file.path(config$cached_data, "expr_seq_voom.gctx"))
+
+    transformed = rnaseq$vst(exprs)
+    io$save(t(ar$stack(transformed, along=2)),
+            file=file.path(config$cached_data, "expr_seq_vst.gctx"))
 }
 
 clinical = function() {
