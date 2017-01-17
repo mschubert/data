@@ -4,7 +4,7 @@ library(dplyr)
 b = import('ebits/base')
 io = import('ebits/io')
 util = import('./util')
-rnaseq = import('ebits/process/rnaseq')
+rnaseq = import('ebits/process/rna-seq')
 
 #' Regular expression for RNA seq v2 files
 archive_regex = "RSEM_genes__data.Level_3.*\\.tar(\\.gz)?$"
