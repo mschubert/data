@@ -23,19 +23,3 @@ unpack = function(files, unpack_dir=tempdir()) {
         untar(file, exdir = unpack_dir)
     file.path(unpack_dir, sub(".tar", "", sub(".gz", "", basename(files))))
 }
-
-#' Perform a voom transformation (for RNA-seq data)
-#'
-#' @param mat  The untransformed matrix [genes x samples]
-#' @param ids  The ID type of genes (only "hgnc" allowed right now)
-#' @return     A matrix of gene expression values [genes x samples]
-voom_transform = function(mat, ids="hgnc") {
-    if (ids != "hgnc")
-        stop("not implemented")
-
-    # apply voom transformation
-    mat = limma::voom(mat)$E
-    rownames(mat) = sub("\\|[0-9]+$", "", rownames(mat))
-    mat = mat[rownames(mat) != "?",]
-    limma::avereps(mat)
-}

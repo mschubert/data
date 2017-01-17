@@ -4,6 +4,7 @@ library(dplyr)
 io = import('ebits/io')
 ar = import('ebits/array')
 util = import('./util')
+rnaseq = import('ebits/process/rnaseq')
 
 #' Regular expression for RNA seq v1 files
 archive_regex = "mRNAseq_Preprocess\\.Level_3.*\\.tar(\\.gz)?$"
@@ -21,7 +22,7 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
     re = io$read_table(fname, header=TRUE, check.names=FALSE)
     mat = data.matrix(re[,-1])
     rownames(mat) = re[,1]
-    util$voom_transform(mat, ids=ids)
+    rnaseq$voom(mat)
 }
 
 #' Process all RNA seq v1 files with voom
