@@ -22,7 +22,7 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
 
     re = io$read_table(fname, header=TRUE, check.names=FALSE)
     re = re[-1, re[1,] %in% c("gene_id", "raw_count")]
-    mat = data.matrix(re[,-1])
+    mat = round(data.matrix(re[,-1]))
     rownames(mat) = re[[1]]
     rnaseq$vst(mat)
 }
