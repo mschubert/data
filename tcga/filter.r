@@ -13,14 +13,16 @@
 #' @param blood_normal  Limi to normals derived from blood
 #' @param tumor    Limit to tumors
 #' @param tissue   Character vector of TCGA identifiers
+#' @param along    If a matrix, which dimension to filter along
+#' @return         The object subset with barcodes that match filters
 filter = function(x, ..., vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL, cancer=NULL,
-        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE) {
+        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
 
     UseMethod("filter")
 }
 
 filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL,
-        cancer=NULL, tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE) {
+        cancer=NULL, tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
 
     args = as.list(.b$match_call_defaults())[-1]
     args$x = x[[args[[2]]]]
@@ -30,16 +32,23 @@ filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL, blood
 
 # matrices and arrays
 filter.matrix = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL, cancer=NULL,
-        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE) {
+        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=1) {
 
     args = as.list(.b$match_call_defaults())[-1]
-    args$x = rownames(x)
-    x[do.call(filter, args),]
+
+    if (along == 1) {
+        args$x = rownames(x)
+        x[do.call(filter, args),]
+    } else if (along == 2) {
+        args$x = colnames(x)
+        x[,do.call(filter, args)]
+    } else
+        stop("only row/col implemented")
 }
 
 # vectors and lists
 filter.default = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL, cancer=NULL,
-        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE) {
+        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
 
     .bc$must_barcode(x)
     fields = .bc$barcode2index(x)
