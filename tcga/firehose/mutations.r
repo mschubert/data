@@ -54,3 +54,9 @@ mutations = function(regex=archive_regex, dir=util$data_dir) {
         lapply(file2mut) %>%
         bind_rows()
 }
+
+if (is.null(module_name())) {
+    mutations = mutations()
+    fname = file.path(module_file(), "../cache", "mutations.RData")
+    io$save(mutations, file=fname)
+}

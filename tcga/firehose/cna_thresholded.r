@@ -43,3 +43,9 @@ cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir) {
                   cytoband = Cytoband,
                   gistic = gistic)
 }
+
+if (is.null(module_name())) {
+    cna = cna_thresholded()
+    fname = file.path(module_file(), "../cache", "cna_thresholded.RData")
+    io$save(cna, file=fname)
+}

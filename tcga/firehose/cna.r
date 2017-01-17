@@ -43,3 +43,9 @@ cna = function(regex=archive_regex, dir=util$analyses_dir) {
                   cytoband = Cytoband,
                   gistic = gistic)
 }
+
+if (is.null(module_name())) {
+    cna = cna()
+    fname = file.path(module_file(), "../cache", "cna.RData")
+    io$save(cna, file=fname)
+}

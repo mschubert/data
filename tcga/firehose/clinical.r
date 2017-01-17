@@ -46,3 +46,9 @@ clinical = function(regex=archive_regex, dir=util$data_dir) {
     rownames(cc) = 1:nrow(cc)
     cc
 }
+
+if (is.null(module_name())) {
+    clinical = clinical()
+    fname = file.path(module_file(), "../cache", "clinical.RData")
+    io$save(clinical, file=fname)
+}
