@@ -7,7 +7,7 @@ ar = import('ebits/array')
 #' Process rna_seq data
 #'
 #' @param force  Overwrite existing files instead of skipping
-rna_seq = function(force=FALSE) {
+rna_seq = function() {
     files = util$list_files("^exp_seq")
     exprs = util$get_matrix(files,
                             raw_read_count ~ gene_id + icgc_specimen_id,
@@ -16,15 +16,12 @@ rna_seq = function(force=FALSE) {
     io$save(t(ar$stack(exprs, along=2)),
             file=file.path(config$cached_data, "expr_seq_raw.gctx"))
 
-    voomfile = file.path(config$cached_data, "expr_seq_voom.gctx")
-    if (identical(force, TRUE) || !file.exists(voomfile)) {
-        exprs = lapply(exprs, function(e) limma::voom(e)$E)
-        io$save(t(ar$stack(exprs, along=2)),
-                file=voomfile)
-    }
+    exprs = lapply(exprs, function(e) limma::voom(e)$E)
+    io$save(t(ar$stack(exprs, along=2)),
+            file=file.path(config$cached_data, "expr_seq_voom.gctx"))
 }
 
-clinical = function(force=FALSE) {
+clinical = function() {
     files = util$list_files("^donor\\.")
     clinical = util$read_files(files) %>%
         data.table::rbindlist() %>%
@@ -33,13 +30,13 @@ clinical = function(force=FALSE) {
     io$save(clinical, file=file.path(config$cached_data, "clinical.RData"))
 }
 
-specimen = function(force=FALSE) {
+specimen = function() {
     fname = file.path(config$raw_data, "Summary/donor.all_projects.tsv.gz")
     specimen = util$read_files(fname)
     io$save(specimen, file=file.path(config$cached_data, "specimen.RData"))
 }
 
-mutations = function(force=FALSE) {
+mutations = function() {
     mut_aggr = function(x) {
         any(x != 0)
     }
@@ -48,13 +45,13 @@ mutations = function(force=FALSE) {
              fun.aggregate = mut_aggr, force=force, map.hgnc=TRUE)
 }
 
-cnv = function(force=FALSE) {
+cnv = function() {
     util$mat("cnv.h5", '^copy_number_somatic_mutation',
              segment_median ~ gene_affected + icgc_sample_id,
              fun.aggregate = mean, map.hgnc=T, force=force)
 }
 
-rppa = function(force=FALSE) {
+rppa = function() {
     util$mat("protein.h5", '^protein_expression',
         normalized_expression_level ~ antibody_id + icgc_sample_id,
         map.hgnc=FALSE, force=force)
