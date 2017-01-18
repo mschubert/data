@@ -32,7 +32,7 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
 #' @return       Expression matrix if save is NULL
-rna_seq2_voom = function(regex=archive_regex, dir=util$data_dir) {
+rna_seq2_vst = function(regex=archive_regex, dir=util$data_dir) {
     elist = util$list_files(dir, regex) %>%
         util$unpack() %>%
         util$list_files("rnaseqv2")
@@ -46,7 +46,7 @@ rna_seq2_voom = function(regex=archive_regex, dir=util$data_dir) {
 }
 
 if (is.null(module_name())) {
-    exprs = rna_seq2_voom()
+    exprs = rna_seq2_vst()
     bigmat = ar$stack(exprs, along=2)
     fname = file.path(module_file(), "../cache", "expr_seq.gctx")
     io$save(t(bigmat), file=fname)

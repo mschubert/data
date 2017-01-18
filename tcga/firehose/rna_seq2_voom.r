@@ -43,3 +43,10 @@ rna_seq2_voom = function(regex=archive_regex, dir=util$data_dir) {
 
     setNames(expr, names)
 }
+
+if (is.null(module_name())) {
+    exprs = rna_seq2_voom()
+    bigmat = ar$stack(exprs, along=2)
+    fname = file.path(module_file(), "../cache", "expr_seq.gctx")
+    io$save(t(bigmat), file=fname)
+}
