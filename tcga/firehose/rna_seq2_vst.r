@@ -50,5 +50,5 @@ if (is.null(module_name())) {
     # need to allow overwrite here because some TCGA cohorts have same patient
     bigmat = ar$stack(exprs, along=2, allow_overwrite=TRUE)
     fname = file.path(module_file(), "../cache", "expr_seq.gctx")
-    io$save(t(bigmat), file=fname)
+    io$save(bigmat, file=fname)
 }

@@ -48,5 +48,5 @@ if (is.null(module_name())) {
     exprs = rna_seq2_voom()
     bigmat = ar$stack(exprs, along=2)
     fname = file.path(module_file(), "../cache", "expr_seq.gctx")
-    io$save(t(bigmat), file=fname)
+    io$save(bigmat, file=fname)
 }

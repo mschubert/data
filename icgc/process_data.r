@@ -9,19 +9,20 @@ rnaseq = import('ebits/process/rna-seq')
 #' @param force  Overwrite existing files instead of skipping
 rna_seq = function() {
     files = util$list_files("^exp_seq")
+    files = files[!grepl("LIRI-JP", files)] # 32 bit integer overflow
     exprs = util$get_matrix(files,
                             raw_read_count ~ gene_id + icgc_specimen_id,
                             map.hgnc=TRUE)
 
-    io$save(t(ar$stack(exprs, along=2)),
+    io$save(ar$stack(exprs, along=2),
             file=file.path(config$cached_data, "expr_seq_raw.gctx"))
 
     transformed = rnaseq$voom(exprs)
-    io$save(t(ar$stack(transformed, along=2)),
+    io$save(ar$stack(transformed, along=2),
             file=file.path(config$cached_data, "expr_seq_voom.gctx"))
 
     transformed = rnaseq$vst(exprs)
-    io$save(t(ar$stack(transformed, along=2)),
+    io$save(ar$stack(transformed, along=2),
             file=file.path(config$cached_data, "expr_seq_vst.gctx"))
 }
 
