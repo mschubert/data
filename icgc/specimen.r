@@ -5,6 +5,5 @@ config = import('./config')
 #'
 #' @return  A data.frame of details of all specimen
 index = function() {
-    fname = file.path(config$raw_data, "Summary", "specimen.all_projects.tsv.gz")
-    io$read_table(fname, header=TRUE)
+    io$load(file.path(config$cached_data, "specimen.RData"))
 }
