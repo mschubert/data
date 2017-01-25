@@ -56,6 +56,7 @@ if (is.null(module_name())) {
 
     expect_equal(subset(mysp, study="KIRC-US"), mysp[c(1,2)])
     expect_equal(subset(mysp, study="ALL-US"), mysp[c(3,4)])
+    expect_equal(subset(mysp, study=c("SKCM-US", "ALL-US")), mysp[c(3,4,5)])
 
     expect_equal(subset(mysp, primary=TRUE), mysp[c(1:4)])
     expect_equal(subset(mysp, cancer=TRUE), mysp[c(2,3,5)])

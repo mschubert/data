@@ -36,7 +36,7 @@ clinical = function() {
 }
 
 specimen = function() {
-    fname = file.path(config$raw_data, "Summary/donor.all_projects.tsv.gz")
+    fname = file.path(config$raw_data, "Summary/specimen.all_projects.tsv.gz")
     specimen = util$read_files(fname)
     io$save(specimen, file=file.path(config$cached_data, "specimen.RData"))
 }
