@@ -1,5 +1,3 @@
-idx = import('./indexing')
-
 #' Function to retrieve the mutation data from the processed ICGC object
 #'
 #' Can do subsetting using either `index`, `samples`, `specimen`, or `donors`.

@@ -1,5 +1,3 @@
-idx = import('./indexing')
-
 #' Function to retrieve the RPPA protein data from the processed ICGC object
 #'
 #' @param index       HDF5 index, either numerical or character;

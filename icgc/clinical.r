@@ -1,5 +1,3 @@
-idx = import('./indexing')
-
 #' Returns a list containing row- and column names for clinical data
 #TODO: give index=, infer id type from it
 clinical = function(specimen=NULL, donors=NULL) {

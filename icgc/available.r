@@ -1,5 +1,4 @@
 b = import('ebits/base')
-idx = import('./indexing')
 
 #' Finds identifiers where data is available
 #'
