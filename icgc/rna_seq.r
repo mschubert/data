@@ -10,12 +10,15 @@ rna_seq = function(study) {
     fname = file.path(config$cached_data, "rna_seq_vst.gctx")
     file = h5::h5file(fname, mode="r")
 
-    ids = file["/0/META/ROW/id"][]
-    ids = subs$subset(ids, study=study)
+    ids = file["/0/META/COL/id"][]
+    keep = ids %in% subs$subset(ids, study=study)
 
-    data = file["/0/DATA/0/matrix"][ids,]
-    rownames(data) = ids
-    colnames(data) = file["/0/META/COL/id"][]
+    data = file["/0/DATA/0/matrix"][which(keep),]
+    rownames(data) = ids[keep]
+    colnames(data) = file["/0/META/ROW/id"][]
+
+    # remove genes with all NA
+    data = data[,colSums(!is.na(data)) != 0]
 
     h5::h5close(file)
     t(data)
