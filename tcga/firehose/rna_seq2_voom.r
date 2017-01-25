@@ -3,6 +3,7 @@
 library(dplyr)
 b = import('ebits/base')
 io = import('ebits/io')
+ar = import('ebits/array')
 util = import('./util')
 rnaseq = import('ebits/process/rna-seq')
 
