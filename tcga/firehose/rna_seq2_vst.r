@@ -49,6 +49,6 @@ if (is.null(module_name())) {
     exprs = rna_seq2_vst()
     # need to allow overwrite here because some TCGA cohorts have same patient
     bigmat = ar$stack(exprs, along=2, allow_overwrite=TRUE)
-    fname = file.path(module_file(), "../cache", "expr_seq_vst.gctx")
+    fname = file.path(module_file(), "../cache", "rna_seq2_vst.gctx")
     io$save(bigmat, file=fname)
 }
