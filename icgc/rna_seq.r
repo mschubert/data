@@ -1,6 +1,3 @@
-idx = import('./indexing')
-pu = import('./process_util')
-
 #' Get a matrix for all RNA-seq measurements
 #'
 #' @param tissue   The tissue(s) to get expression for
