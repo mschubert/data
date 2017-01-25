@@ -1,24 +1,22 @@
 idx = import('./indexing')
 pu = import('./process_util')
 
-#' Function to retrieve the RNA seq data from the processed ICGC object
+#' Get a matrix for all RNA-seq measurements
 #'
-#' @param index       HDF5 index, either numerical or character;
-#'                    If a character vector ICGC ids will be matched:
-#'                    SA*: sample ID, SP*: specimen ID, SD*: donor ID
-#' @param raw_counts  Get the raw counts (as opposed to normalized)
-#' @param map_ids     character vector to map identifiers to: 'icgc_sample_id', 
-#'                     'icgc_specimen_id', 'donor_id' [default: same as requested
-#'                    identifiers]
-#' @return            The requested sample matrix
-rna_seq = function(index=available(rna_seq=TRUE), raw_counts=FALSE, voom=FALSE,
-                   map_ids=TRUE) {
-    if (voom)
-        fname = "expr_seq_voom"
-    else if (raw_counts)
-        fname = "expr_seq_raw"
-    else
-        fname = "expr_seq_norm"
+#' @param tissue   The tissue(s) to get expression for
+#' @return         A matrix with HGNC symbols x TCGA samples
+rna_seq = function(tissue) {
+    library(methods) # required; otherwise h5 error
+    file = h5::h5file(module_file("cache", "rna_seq2_vst.gctx"), mode="r")
 
-    idx$getHDF5(index=index, map_ids=map_ids, fname=fname)
+    barcodes = file["/0/META/ROW/id"][]
+    studies = .bc$barcode2study(barcodes)
+    keep = studies %in% tissue
+
+    data = file["/0/DATA/0/matrix"][which(keep),]
+    rownames(data) = barcodes[keep]
+    colnames(data) = file["/0/META/COL/id"][]
+
+    h5::h5close(file)
+    t(data)
 }
