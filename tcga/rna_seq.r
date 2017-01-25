@@ -13,15 +13,15 @@ rna_seq = function(tissue, id_type="specimen", ...) {
     library(methods) # required; otherwise h5 error
 #    .load("cache", paste0(tissue, "_voom.RData")) %>%
 #        .map_id(id_type=id_type, ...)
-    file = h5::h5file(module_file("cache", "rna_seq2_vst.h5"), mode="r")
+    file = h5::h5file(module_file("cache", "rna_seq2_vst.gctx"), mode="r")
 
-    barcodes = file["row"][]
+    barcodes = file["/0/META/ROW/id"][]
     studies = .bc$barcode2study(barcodes)
     keep = studies %in% tissue
 
-    data = file["data"][which(keep),]
+    data = file["/0/DATA/0/matrix"][which(keep),]
     rownames(data) = barcodes[keep]
-    colnames(data) = file["col"][]
+    colnames(data) = file["/0/META/COL/id"][]
 
     h5::h5close(file)
     .map_id(t(data), id_type=id_type, ...)
