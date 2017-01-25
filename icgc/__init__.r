@@ -1,5 +1,6 @@
 #available = import('./available')$available
-specimen = import('./index')$specimen
+studies = import('./studies')$studies
+specimen = import('./specimen')$specimen
 #clinical = import('./clinical')$clinical
 #mutations = import('./mutations')$mutations
 rna_seq = import('./rna_seq')$rna_seq
