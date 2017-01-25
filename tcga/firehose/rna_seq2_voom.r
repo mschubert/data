@@ -23,7 +23,12 @@ file2expr = function(fname, ids="hgnc", quiet=FALSE) {
     re = io$read_table(fname, header=TRUE, check.names=FALSE)
     re = re[-1, re[1,] %in% c("gene_id", "raw_count")]
     mat = data.matrix(re[,-1])
-    rownames(mat) = re[[1]]
+
+    # remove 29 entrez IDs w/o HGNC symbol
+    # average expression of SLC35E2 for 2 entrez IDs
+    rownames(mat) = sub("\\|[0-9]+$", "", re[[1]])
+    mat = limma::avereps(mat[rownames(mat) != '?',])
+
     rnaseq$voom(mat)
 }
 
