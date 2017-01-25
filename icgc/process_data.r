@@ -15,15 +15,15 @@ rna_seq = function() {
                             map.hgnc=TRUE)
 
     io$save(ar$stack(exprs, along=2),
-            file=file.path(config$cached_data, "expr_seq_raw.gctx"))
+            file=file.path(config$cached_data, "rna_seq_raw.gctx"))
 
     transformed = rnaseq$voom(exprs)
     io$save(ar$stack(transformed, along=2),
-            file=file.path(config$cached_data, "expr_seq_voom.gctx"))
+            file=file.path(config$cached_data, "rna_seq_voom.gctx"))
 
     transformed = rnaseq$vst(exprs)
     io$save(ar$stack(transformed, along=2),
-            file=file.path(config$cached_data, "expr_seq_vst.gctx"))
+            file=file.path(config$cached_data, "rna_seq_vst.gctx"))
 }
 
 clinical = function() {

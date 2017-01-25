@@ -4,7 +4,7 @@
 #' @return         A matrix with HGNC symbols x TCGA samples
 rna_seq = function(tissue) {
     library(methods) # required; otherwise h5 error
-    file = h5::h5file(module_file("cache", "rna_seq2_vst.gctx"), mode="r")
+    file = h5::h5file(module_file("cache", "rna_seq_vst.gctx"), mode="r")
 
     barcodes = file["/0/META/ROW/id"][]
     studies = .bc$barcode2study(barcodes)
