@@ -7,7 +7,7 @@ config = import('./config')
 #' @param map_ids    Type of IDs to map to, default: same as requested
 #' @param filter_to  Set of IDs to map to
 #' @return           List with file index and mapped column names
-varmap = function(valid, map_ids=TRUE, filter_to=NULL) {
+idmap = function(valid, map_ids=TRUE, filter_to=NULL) {
     if (is.character(map_ids))
         to = map_ids
     else if (identical(map_ids, FALSE) || all(grepl("^SA", filter_to)))
