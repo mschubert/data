@@ -15,14 +15,23 @@ rna_seq = function(tissue, id_type="specimen", ...) {
 #        .map_id(id_type=id_type, ...)
     file = h5::h5file(module_file("cache", "rna_seq2_vst.gctx"), mode="r")
 
-    barcodes = file["/0/META/ROW/id"][]
+    barcodes = file["/0/META/COL/id"][]
     studies = .bc$barcode2study(barcodes)
     keep = studies %in% tissue
 
     data = file["/0/DATA/0/matrix"][which(keep),]
     rownames(data) = barcodes[keep]
-    colnames(data) = file["/0/META/COL/id"][]
+    colnames(data) = file["/0/META/ROW/id"][]
 
     h5::h5close(file)
     .map_id(t(data), id_type=id_type, ...)
+}
+
+if (is.null(module_name())) {
+    library(testthat)
+
+    import('./rna_seq', attach=T)
+    expr = rna_seq("ACC")
+
+    expect_true(all(.bc$is_barcode(colnames(expr))))
 }
