@@ -1,4 +1,5 @@
 io = import('io')
+.filter = import('./filter')$filter
 
 #' Returns the RNA-seq expression matrix
 #'
@@ -12,9 +13,18 @@ rna_seq = function(tissue=NULL, sample=NULL, gene=NULL) {
     file = h5::h5file(fpath, mode="r")
 
     ids = file["/0/META/COL/id"][]
-#    keep = ids %in% subs$subset(ids, study=study)
 
-    data = file["/0/DATA/0/matrix"][which(keep),]
+    if (!is.null(tissue))
+        keep = ids %in% .filter(tissue=tissue)
+
+    if (!is.null(sample))
+        keep = ids & ids %in% sample
+
+    if (is.null(gene))
+        data = file["/0/DATA/0/matrix"][which(keep),]
+    else
+        data = file["/0/DATA/0/matrix"][which(keep),gene]
+
     rownames(data) = ids[keep]
     colnames(data) = file["/0/META/ROW/id"][]
 
