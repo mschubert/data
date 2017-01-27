@@ -8,4 +8,4 @@ rna_seq = import('./rna_seq')$rna_seq
 rppa = import('./rppa')$rppa
 bem = import('./bem')$bem
 intersect = import('./intersect')$intersect
-intersect = import('./tissues')$tissues
+tissues = import('./tissues')$tissues
