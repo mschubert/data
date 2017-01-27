@@ -4,6 +4,10 @@ io = import('io')
 #'
 #' @return  A data.frame
 samples = function() {
-	fpath = module_file("cache", "samples.RData", mustWork=TRUE)
+	fpath = file.path(module_file("cache", mustWork=TRUE), "samples.RData")
+    if (!file.exists(fpath)) {
+        p = import('./process_data')
+        p$samples()
+    }
 	io$load(fpath)
 }

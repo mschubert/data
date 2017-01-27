@@ -9,7 +9,7 @@ io = import('io')
 #' @return       A data.frame
 donors = function(hardy=0:4) {
 	fname = "GTEx_Data_V6_Annotations_SubjectPhenotypesDS.txt"
-    fpath = io$read_table(module_file("data"), fname, mustWork=TRUE)
+    fpath = module_file("data", fname, mustWork=TRUE)
 	io$read_table(fpath, header=TRUE) %>%
 		dplyr::filter(DTHHRDY %in% hardy)
 }
