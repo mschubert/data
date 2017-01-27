@@ -5,7 +5,7 @@
 #' @param cancer   IDs must be cancer
 #' @param normal   IDs must be normals
 #' @return         A filtered vector or matrix
-subset = function(x, study=NULL, primary=NULL, cancer=NULL, normal=NULL) {
+filter = function(x, study=NULL, primary=NULL, cancer=NULL, normal=NULL) {
     sp = import('./specimen')$specimen()
 
     if (!is.null(study))
@@ -54,18 +54,18 @@ if (is.null(module_name())) {
         "SP120560" # SKCM-US, distant metastasis
     )
 
-    expect_equal(subset(mysp, study="KIRC-US"), mysp[c(1,2)])
-    expect_equal(subset(mysp, study="ALL-US"), mysp[c(3,4)])
-    expect_equal(subset(mysp, study=c("SKCM-US", "ALL-US")), mysp[c(3,4,5)])
+    expect_equal(filter(mysp, study="KIRC-US"), mysp[c(1,2)])
+    expect_equal(filter(mysp, study="ALL-US"), mysp[c(3,4)])
+    expect_equal(filter(mysp, study=c("SKCM-US", "ALL-US")), mysp[c(3,4,5)])
 
-    expect_equal(subset(mysp, primary=TRUE), mysp[c(1:4)])
-    expect_equal(subset(mysp, cancer=TRUE), mysp[c(2,3,5)])
-    expect_equal(subset(mysp, normal=TRUE), mysp[c(1,4)])
+    expect_equal(filter(mysp, primary=TRUE), mysp[c(1:4)])
+    expect_equal(filter(mysp, cancer=TRUE), mysp[c(2,3,5)])
+    expect_equal(filter(mysp, normal=TRUE), mysp[c(1,4)])
 
-    expect_equal(subset(mysp, study="KIRC-US", primary=TRUE), mysp[c(1,2)])
-    expect_equal(subset(mysp, study="KIRC-US", cancer=TRUE), mysp[2])
-    expect_equal(subset(mysp, study="KIRC-US", normal=TRUE), mysp[1])
+    expect_equal(filter(mysp, study="KIRC-US", primary=TRUE), mysp[c(1,2)])
+    expect_equal(filter(mysp, study="KIRC-US", cancer=TRUE), mysp[2])
+    expect_equal(filter(mysp, study="KIRC-US", normal=TRUE), mysp[1])
 
-    expect_equal(subset(mysp, study="SKCM-US", primary=TRUE), character())
-    expect_equal(subset(mysp, study="SKCM-US", cancer=TRUE), mysp[5])
+    expect_equal(filter(mysp, study="SKCM-US", primary=TRUE), character())
+    expect_equal(filter(mysp, study="SKCM-US", cancer=TRUE), mysp[5])
 }

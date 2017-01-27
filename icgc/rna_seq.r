@@ -1,5 +1,5 @@
 config = import('./config')
-subs = import('./subset')
+f = import('./filter')
 
 #' Get a matrix for all RNA-seq measurements
 #'
@@ -11,7 +11,7 @@ rna_seq = function(study) {
     file = h5::h5file(fname, mode="r")
 
     ids = file["/0/META/COL/id"][]
-    keep = ids %in% subs$subset(ids, study=study)
+    keep = ids %in% f$filter(ids, study=study)
 
     data = file["/0/DATA/0/matrix"][which(keep),]
     rownames(data) = ids[keep]
