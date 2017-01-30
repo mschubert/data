@@ -26,23 +26,24 @@ summary=(
     specimen.all_projects.tsv.gz
 )
 
-contents=( # comment out datasets you don't want
-	copy_number_somatic_mutation.%.tsv.gz
-	donor.%.tsv.gz
-	donor_biomarker.%.tsv.gz
-	donor_exposure.%.tsv.gz
-	donor_family.%.tsv.gz
-	donor_therapy.%.tsv.gz
-	exp_array.%.tsv.gz
-	exp_seq.%.tsv.gz
-	meth_array.%.tsv.gz
-	meth_seq.%.tsv.gz
-	mirna_seq.%.tsv.gz
-	protein_expression.%.tsv.gz
-	sample.%.tsv.gz
-	simple_somatic_mutation.open.%.tsv.gz
-	specimen.%.tsv.gz
-	structural_somatic_mutation.%.tsv.gz
+# comment out datasets you don't want
+contents=(
+    copy_number_somatic_mutation.%.tsv.gz
+    donor.%.tsv.gz
+    donor_biomarker.%.tsv.gz
+    donor_exposure.%.tsv.gz
+    donor_family.%.tsv.gz
+    donor_therapy.%.tsv.gz
+    exp_array.%.tsv.gz
+    exp_seq.%.tsv.gz
+    meth_array.%.tsv.gz
+    meth_seq.%.tsv.gz
+    mirna_seq.%.tsv.gz
+    protein_expression.%.tsv.gz
+    sample.%.tsv.gz
+    simple_somatic_mutation.open.%.tsv.gz
+    specimen.%.tsv.gz
+    structural_somatic_mutation.%.tsv.gz
 )
 
 download_file() {
