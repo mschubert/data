@@ -7,7 +7,7 @@ io = import('io')
 #' @param sample  Only return sample IDs
 #' @param gene    Only return HGNC symbols
 #' @return        A gene expression matrix (genes x samples)
-rna_seq = function(tissue=NULL, sample=NULL, gene=NULL) {
+rna_seq = function(tissue=NULL, sample=NULL, gene=TRUE) {
 	fpath = module_file("cache", "rna_seq_vst.gctx", mustWork=TRUE)
 
     file = h5::h5file(fpath, mode="r")
@@ -20,10 +20,7 @@ rna_seq = function(tissue=NULL, sample=NULL, gene=NULL) {
     if (!is.null(sample))
         keep = ids & ids %in% sample
 
-    if (is.null(gene))
-        data = file["/0/DATA/0/matrix"][which(keep),]
-    else
-        data = file["/0/DATA/0/matrix"][which(keep),gene]
+	data = file["/0/DATA/0/matrix"][which(keep),gene]
 
     rownames(data) = ids[keep]
     colnames(data) = file["/0/META/ROW/id"][]
@@ -33,4 +30,8 @@ rna_seq = function(tissue=NULL, sample=NULL, gene=NULL) {
 
     h5::h5close(file)
     t(data)
+}
+
+if (is.null(module_name())) {
+	expr = gtex$rna_seq("Fallopian Tube") # 2 samples
 }
