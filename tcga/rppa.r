@@ -10,5 +10,5 @@
 #' @return         A matrix with antibodies x TCGA samples
 rppa = function(id_type="specimen", ...) {
     .load("cache", "rppa.RData") %>%
-        .map_id(id_type=id_type, along=1, ...)
+        .map_id(id_type=id_type, along=2, ...)
 }
