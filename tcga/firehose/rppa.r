@@ -15,12 +15,14 @@ archive_regex = "RPPA_AnnotateWithGene.Level_3.*\\.tar(\\.gz)?$"
 #' @param quiet  Print file name currently processing 
 #' @return       An expression matrix with genes x samples
 file2rppa = function(fname, quiet=FALSE) {
+    message(fname)
+
     if (!quiet)
         message(fname)
 
     re = io$read_table(fname, header=TRUE)
     mat = data.matrix(re[,-1])
-    rownames(mat) = re[,1]
+    rownames(mat) = re[[1]]
     mat
 }
 
@@ -36,6 +38,11 @@ rppa = function(regex=archive_regex, dir=util$data_dir) {
 
     rppa = elist %>%
         lapply(file2rppa) %>%
-#        setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", elist)) %>%
         ar$stack( along=2)
+}
+
+if (is.null(module_name())) {
+    rppa = rppa()
+    fname = file.path(module_file(), "../cache", "rppa.RData")
+    io$save(rppa, file=fname)
 }
