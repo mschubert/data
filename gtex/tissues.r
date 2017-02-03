@@ -2,12 +2,16 @@
 
 #' Return tissue identifiers with sample IDs as names
 #'
-#' @param tissue  Return only IDs for a specific tissue
+#' @param tissue  A character vector of which tissues to return
 #' @param detail  Use more detailed tissue descriptors
-tissues = function(tissue, detail=FALSE) {
+tissues = function(tissue=NULL, detail=FALSE) {
     field = "SMTS"
     if (detail)
         field = paste0(field, "D")
 
-    setNames(.samples$SAMPID, .samples[[field]])
+    re = setNames(samples[[field]], .samples$SAMPID)
+    if (is.null(tissue))
+        re
+    else
+        re[re %in% tissue]
 }
