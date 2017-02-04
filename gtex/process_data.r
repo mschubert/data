@@ -1,4 +1,5 @@
 io = import('io')
+ar = import('array')
 l1k = import('io/l1ktools_io')
 idmap = import('process/idmap')
 rnaseq = import('ebits/process/rna-seq')
@@ -14,7 +15,22 @@ rna_seq = function() {
 
 	# sum all ensembl genes for each hgnc symbol to get counts
 	expr = idmap$gene(expr, to="hgnc_symbol", summarize=sum)
-	expr = rnaseq$vst(expr)
+
+#    # split in subsets for vst transform
+#    tissues = import('./tissues')$tissues()
+#    tissues[tissues == "Fallopian Tube"] = "Ovary"
+#    tissues[tissues == "Cervix Uteri"] = "Uterus"
+#    tissues[tissues == "Bladder"] = "Kidney"
+#    common = intersect(names(tissues), colnames(expr))
+#    tissues = tissues[common]
+#    expr = expr[,common]
+#
+#    expr = ar$split(expr, along=2, subsets=tissues)
+#    expr = lapply(expr, na.omit)
+#    expr = lapply(expr, rnaseq$vst)
+#    expr = ar$stack(expr, along=2)
+
+    expr = rnaseq$vst(expr) # adjust design for tissue here?
 
 	fout = file.path(module_file("cache", mustWork=TRUE), "rna_seq_vst.gctx")
 	io$save(expr, file=fout)
