@@ -9,7 +9,7 @@ tissues = function(tissue=NULL, detail=FALSE) {
     if (detail)
         field = paste0(field, "D")
 
-    re = setNames(samples[[field]], .samples$SAMPID)
+    re = setNames(.samples[[field]], .samples$SAMPID)
     if (is.null(tissue))
         re
     else
