@@ -4,7 +4,7 @@ l1k = import('io/l1ktools_io')
 idmap = import('process/idmap')
 rnaseq = import('ebits/process/rna-seq')
 
-#' Generate the RNA expression object
+#' Generate the RNA expression object (takes about 7 days to run)
 #'
 #' Reads the Ensembl ID gene counts from the original GTEx .gct expression
 #' file, maps the IDs to hgnc symbols, runs a variance stabilizing trans-
