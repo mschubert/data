@@ -13,16 +13,19 @@
 #' @param blood_normal  Limi to normals derived from blood
 #' @param tumor    Limit to tumors
 #' @param tissue   Character vector of TCGA identifiers
+#' @param matched  Return only samples for which there is a matched cancer/normal available
 #' @param along    If a matrix, which dimension to filter along
 #' @return         The object subset with barcodes that match filters
-filter = function(x, ..., vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL, cancer=NULL,
-        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
+filter = function(x, ..., vial=NULL, primary=NULL, normal=NULL,
+                  blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
+                  include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
 
     UseMethod("filter")
 }
 
-filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL,
-        cancer=NULL, tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
+filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL,
+                             blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
+                             include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
 
     args = as.list(.b$match_call_defaults())[-1]
     args$x = x[[args[[2]]]]
@@ -31,8 +34,9 @@ filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL, blood
 }
 
 # matrices and arrays
-filter.matrix = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL, cancer=NULL,
-        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=1) {
+filter.matrix = function(x, vial=NULL, primary=NULL, normal=NULL,
+                         blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
+                         include_cell_lines=FALSE, include_xenografts=FALSE, along=1) {
 
     args = as.list(.b$match_call_defaults())[-1]
 
@@ -47,8 +51,9 @@ filter.matrix = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=N
 }
 
 # vectors and lists
-filter.default = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=NULL, cancer=NULL,
-        tissue=NULL, include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
+filter.default = function(x, vial=NULL, primary=NULL, normal=NULL,
+                          blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
+                          include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
 
     .bc$must_barcode(x)
     fields = .bc$barcode2index(x)
@@ -77,7 +82,7 @@ filter.default = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=
     if (!is.null(normal))
         keep = keep & eq(normal, grepl("Normal", fields$Sample.Definition))
 
-    #TODO: should be included in 'normal' if blood cancer
+    #TODO: should be included in 'normal' if blood cancer?
     if (!is.null(blood_normal))
         keep = keep & eq(blood_normal, grepl("Blood", fields$Sample.Definition))
 
@@ -86,6 +91,14 @@ filter.default = function(x, vial=NULL, primary=NULL, normal=NULL, blood_normal=
 
     if (!is.null(tissue))
         keep = keep & fields$Study.Abbreviation %in% tissue
+
+    if (!is.null(matched)) {
+		matched = fields %>%
+            dplyr::group_by(TSS.Code, Participant.ID) %>%
+            dplyr::mutate(keep = "TP" %in% Short.Letter.Code &
+                                 "NT" %in% Short.Letter.Code)
+        keep = keep & matched$keep
+	}
 
     if (sum(keep) == 0)
         warning("No entries left after filtering TCGA barcodes\n", immediate.=TRUE)
@@ -126,11 +139,18 @@ if (is.null(module_file())) {
                  filter(tdf, "barcode", tissue="SKCM")$barcode,
                  names(filter(tumors, tissue="SKCM")))
 
-    normals = c("TCGA-39-5021-11A", "TCGA-55-7726-10A-01D", "TCGA-JY-A6FA-10A-01D",
+    normals = c("TCGA-AA-3984-11A", "TCGA-55-7726-10A-01D", "TCGA-JY-A6FA-10A-01D",
         "TCGA-26-5134-10A", "TCGA-D1-A0ZS-10A", "TCGA-FW-A3R5-11A-11D",
         "TCGA-BS-A0UV-10A", "TCGA-78-7155-10A-01D")
 
     expect_equal(filter(normals),
                  filter(normals, normal=TRUE),
                  filter(normals, normal=TRUE, vial="A"))
+
+    matched = c(tumors, normals)
+    is_true = function(x) names(x)[x]
+    pos = c("TCGA-AA-3984-01A", "TCGA-AA-3984-11A")
+    expect_equal(is_true(filter(matched, matched=TRUE)), pos)
+    expect_equal(is_true(filter(matched, matched=TRUE, cancer=TRUE)), pos[1])
+    expect_equal(is_true(filter(matched, matched=TRUE, normal=TRUE)), pos[2])
 }
