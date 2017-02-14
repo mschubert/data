@@ -17,11 +17,12 @@ filter.character = function(x, tissue=NULL, hardy=1:4) {
 
     # filter by tissue
     if (!is.null(tissue))
-        keep = keep & x %in% .tissues$tissues(tissue)
+        keep = keep & x %in% names(.tissues$tissues(tissue))
 
+# do not filter donors because list in data dir incomplete
     # filter by hardy death scale
-    donors = .donors$donors(hardy=hardy)
-    keep = keep & substr(x, 1, 9) %in% donors$SUBJID
+#    donors = .donors$donors(hardy=hardy)
+#    keep = keep & substr(x, 1, 10) %in% donors$SUBJID
 
     if (sum(keep) == 0)
         warning("No entries left after filtering TCGA barcodes\n", immediate.=TRUE)

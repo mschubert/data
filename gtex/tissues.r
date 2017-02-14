@@ -14,5 +14,5 @@ tissues = function(tissue=NULL, detail=FALSE, na_rm=TRUE) {
     if (is.null(tissue))
         .omit$na(re, omit=na_rm)
     else
-        .ommit$na(re[re %in% tissue], omit=na_rm)
+        .omit$na(re[re %in% tissue], omit=na_rm)
 }
