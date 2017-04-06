@@ -36,7 +36,7 @@ filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL,
 # matrices and arrays
 filter.matrix = function(x, vial=NULL, primary=NULL, normal=NULL,
                          blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
-                         include_cell_lines=FALSE, include_xenografts=FALSE, along=1) {
+                         include_cell_lines=FALSE, include_xenografts=FALSE, along=2) {
 
     args = as.list(.b$match_call_defaults())[-1]
 
