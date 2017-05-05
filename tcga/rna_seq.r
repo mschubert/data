@@ -11,8 +11,6 @@
 #' @return         A matrix with HGNC symbols x TCGA samples
 rna_seq = function(tissue, id_type="specimen", ...) {
     library(methods) # required; otherwise h5 error
-#    .load("cache", paste0(tissue, "_voom.RData")) %>%
-#        .map_id(id_type=id_type, ...)
     file = h5::h5file(module_file("cache", "rna_seq2_vst.gctx"), mode="r")
 
     barcodes = file["/0/META/COL/id"][]
@@ -30,7 +28,7 @@ rna_seq = function(tissue, id_type="specimen", ...) {
 if (is.null(module_name())) {
     library(testthat)
 
-    import('./rna_seq', attach=T)
+    import('./rna_seq', attach=TRUE)
     expr = rna_seq("ACC")
 
     expect_true(all(.bc$is_barcode(colnames(expr))))
