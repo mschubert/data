@@ -56,8 +56,8 @@ IlluminaGA_RNASeqV2	IlluminaGA_RNASeqV2	Illumina Genome Analyzer RNA Sequencing 
 IlluminaHiSeq_RNASeqV2	IlluminaHiSeq_RNASeqV2	Illumina HiSeq 2000 RNA Sequencing Version 2 analysis	Yes
 IlluminaHiSeq_DNASeq_Cont	Mutation Calling	Illumina HiSeq 2000 DNA Sequencing - Controlled	Yes
 IlluminaGA_DNASeq_Cont	Mutation Calling	Illumina Genome Analyzer DNA Sequencing - Controlled	Yes
-SOLiD_DNASeq_Cont	Mutation Calling	ABI SOLiD DNA Sequencing - Controlled	Yes
 IlluminaHiSeq_TotalRNASeqV2	IlluminaHiSeq_TotalRNASeqV2	Illumina HiSeq 2000 Total RNA Sequencing Version 2 analysis	Yes
+SOLiD_DNASeq_Cont	Mutation Calling	ABI SOLiD DNA Sequencing - Controlled	Yes
 Mixed_DNASeq	Mutation Calling	Mixed DNA Sequencing	Yes
 Mixed_DNASeq_Cont	Mutation Calling	Mixed DNA Sequencing - Controlled	Yes
 IlluminaHiSeq_WGBS	IlluminaHiSeq_WGBS	Illumina HiSeq 2000 Bisulfite-converted DNA Sequencing	Yes
@@ -77,3 +77,6 @@ SOLiD_DNASeq_Cont_automated	Automated Mutation Calling	SOLiD automated DNA seque
 SOLiD_DNASeq_Cont_curated	Curated Mutation Calling	SOLiD curated DNA sequencing - controlled	Yes
 Mixed_DNASeq_Cont_automated	Automated Mutation Calling	Mixed automated DNA sequencing - controlled	Yes
 Mixed_DNASeq_Cont_curated	Curated Mutation Calling	Mixed curated DNA sequencing - controlled	Yes
+supplemental_clinical	supplemental_clinical	supplemental_clinical	No
+Multicenter_mutation_calling_MC3	Multicenter Mutation Calling (MC3)	Multi-Center Mutations	Yes
+Multicenter_mutation_calling_MC3_Cont	Multicenter Mutation Calling (MC3)	Multi-Center Mutations - Controlled	Yes
