@@ -25,13 +25,13 @@ intersect = function(..., along=1, envir=parent.frame()) {
     # use shortest barcodes
     for (i in seq_along(dots)) {
         if (is.call(dots[[i]])) {
-            if (along == 1 && is.data.frame(eval(dots[[i]][[2]], envir=envir))) {
+            if (is.data.frame(eval(dots[[i]][[2]], envir=envir))) {
                 obj = as.data.frame(eval(dots[[i]][[2]], envir=envir))
                 field = as.character(dots[[i]][[3]])
                 obj[[field]] = substr(obj[[field]], 1, min_len)
                 assign(as.character(dots[[i]][[2]]), obj, envir=envir)
             } else
-                stop("calls can only reference `data.frame` fields with along=1")
+                stop("calls can only reference `data.frame`s")
         } else {
             obj = as.array(objs[[i]])
             dimnames(obj)[[along]] = substr(dimnames(obj)[[along]], 1, min_len)
