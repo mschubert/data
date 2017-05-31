@@ -8,7 +8,8 @@ io = import('ebits/io')
 #'               'ensembl_gene_id', etc.)
 #' @return  
 go = function(names="both", genes="hgnc_symbol") {
-    fname = module_file("cache", paste("go-", genes, ".RData"))
+    fname = file.path(module_file("cache", mustWork=TRUE),
+                      paste("go-", genes, ".RData"))
 
     if (file.exists(fname)) {
         sets = io$load(fname)
