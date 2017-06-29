@@ -60,13 +60,36 @@ barcode2index = function(ids) {
 }
 
 #' Take a barcode and extract the study from it
+#'
+#' @param ids  Character vector of TCGA barcodes
+#' @return     Named (barcodes) character vector of TCGA study cohorts
 barcode2study = function(ids) {
     barcode2index(ids) %>%
-        dplyr::select(Study.Abbreviation) %>%
-        unlist() %>%
+        dplyr::pull(Study.Abbreviation) %>%
         setNames(ids)
 }
 
+#' Take a barcode and extract the study from it
+#'
+#' @param ids         Character vector of TCGA barcodes
+#' @param short       Use short type descriptors
+#' @param factor_ref  Convert to factor with this reference level
+barcode2type = function(ids, short=FALSE, factor_ref=NA) {
+    if (short)
+        ref = "Sample.Code"
+    else
+        ref = "Sample.Definition"
+
+    re = barcode2index(ids) %>%
+        dplyr::select_(ref) %>%
+        unlist() %>%
+        setNames(ids)
+
+    if (!is.na(factor_ref))
+        relevel(factor(re), factor_ref)
+    else
+        re
+}
 
 if (is.null(module_name())) {
     library(testthat)
