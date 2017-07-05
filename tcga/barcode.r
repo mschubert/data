@@ -72,18 +72,19 @@ barcode2study = function(ids) {
 #' Take a barcode and extract the study from it
 #'
 #' @param ids         Character vector of TCGA barcodes
-#' @param short       Use short type descriptors
+#' @param short       Use "primary", "normal", etc.
 #' @param factor_ref  Convert to factor with this reference level
-barcode2type = function(ids, short=FALSE, factor_ref=NA) {
-    if (short)
-        ref = "Sample.Code"
-    else
-        ref = "Sample.Definition"
+barcode2type = function(ids, short=TRUE, factor_ref=NA) {
+    if (short) {
+        lookup = setNames(c("primary", "normal", "recurrent", "metastasis"),
+                          c("0", "1", "2", "5"))
+        re = unname(lookup[substr(ids, 14, 14)])
+    } else
+        re = barcode2index(ids) %>%
+            dplyr::select_("Sample.Definition") %>%
+            unlist() %>%
+            setNames(ids)
 
-    re = barcode2index(ids) %>%
-        dplyr::select_(ref) %>%
-        unlist() %>%
-        setNames(ids)
 
     if (!is.na(factor_ref))
         relevel(factor(re), factor_ref)
