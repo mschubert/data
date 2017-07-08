@@ -20,7 +20,7 @@ rna_seq = function(tissue, id_type="specimen", genes=TRUE, ...) {
 
     all_genes = file["/0/META/ROW/id"][]
     if (identical(genes, TRUE))
-        gene_idx = TRUE
+        gene_idx = seq_along(all_genes)
     else
         gene_idx = match(genes, all_genes)
 
@@ -36,7 +36,8 @@ if (is.null(module_name())) {
     library(testthat)
 
     import('./rna_seq', attach=TRUE)
-    expr = rna_seq("ACC")
+    expr = rna_seq("ACC", genes=c("TP53", "KRAS"))
 
     expect_true(all(.bc$is_barcode(colnames(expr))))
+    expect_equal(rownames(expr), c("TP53", "KRAS"))
 }
