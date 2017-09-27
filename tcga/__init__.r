@@ -4,6 +4,7 @@ export_submodule('./filter')
 clinical = import('./clinical')$clinical
 cohorts = import('./cohorts')$cohorts
 cna = import('./cna')$cna
+cna_absolute = import('./cna_absolute')$cna_absolute
 mutations = import('./mutations')$mutations
 rna_seq = import('./rna_seq')$rna_seq
 rna_seq_genes = import('./rna_seq_genes')$rna_seq_genes
