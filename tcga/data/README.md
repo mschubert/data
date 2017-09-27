@@ -20,3 +20,7 @@ emanuel's TCGA processed data for the GDSC paper
 ## BEMs
 
 http://www.cancerrxgene.org/gdsc1000/GDSC1000_WebResources/Home.html
+
+## ABSOLUTE copy numbers
+
+https://www.synapse.org/#!Synapse:syn1710464
