@@ -1,8 +1,5 @@
-.io = import('ebits/io')
 .bc = import('./barcode')
 .map_id = import('./map_id')$map_id
-
-.load = function(...) .io$load(module_file(..., mustWork=TRUE))
 
 #' Get a matrix for all RNA-seq measurements
 #'

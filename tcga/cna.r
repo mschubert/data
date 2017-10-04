@@ -1,15 +1,15 @@
 `%>%` = magrittr::`%>%`
-.io = import('ebits/io')
+.bc = import('./barcode')
 .map_id = import('./map_id')$map_id
-
-.load = function(...) .io$load(module_file(..., mustWork=TRUE))
 
 #' Get a data.frame listing all GISTIC scores for CNAs
 #'
 #' @param tissue   The tissue(s) to get expression for
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
+#' @param thresh   Whether to return thresholded values
+#' @param genes    Genes to retrieve (default: all)
 #' @return         A data.frame with data for all the simple mutations
-cna_gistic = function(tissue, id_type="specimen", thresh=FALSE, ...) {
+cna_gistic = function(tissue, id_type="specimen", thresh=FALSE, genes=TRUE, ...) {
     if (thresh)
         fname = "cna_gistic_thresholded.gctx"
     else
