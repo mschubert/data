@@ -3,13 +3,14 @@
 data_dir = module_file("..", "data", "stddata__2016_01_28", mustWork=TRUE)
 analyses_dir = module_file("..", "data", "analyses__2016_01_28", mustWork=TRUE)
 
-#' Finds files that match a regular expression
+#' Finds files that match a regular expression (and are not aggregate cohorts)
 #'
 #' @param dir    The directory where to look for files
 #' @param regex  A regular expression to match files
 #' @return       A character vector of matched files
 list_files = function(dir, regex) {
-    list.files(dir, pattern=regex, full.names=TRUE, recursive=TRUE)
+    fnames = list.files(dir, pattern=regex, full.names=TRUE, recursive=TRUE)
+    fnames[!grepl("gdac\\.broadinstitute\\.org_(COADREAD|GBMLGG|KIPAN|STES)", fnames)]
 }
 
 #' Unpacks a Firehose archive and returns the directory

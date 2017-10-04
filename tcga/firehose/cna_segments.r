@@ -28,7 +28,7 @@ file2cna = function(fname, quiet=FALSE) {
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
 #' @return       Clinical data.frame if save is NULL
-cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir) {
+cna_segments = function(regex=archive_regex, dir=util$data_dir) {
     clist = util$list_files(dir, regex) %>%
         util$unpack() %>%
         util$list_files("all_thresholded.by_genes\\.txt")
@@ -44,8 +44,8 @@ cna_thresholded = function(regex=archive_regex, dir=util$analyses_dir) {
                   gistic = gistic)
 }
 
-if (is.null(module_name())) {
-    cna = cna_thresholded()
-    fname = file.path(module_file(), "../cache", "cna_thresholded.RData")
-    io$save(cna, file=fname)
-}
+#if (is.null(module_name())) {
+#    cna = cna_thresholded()
+#    fname = file.path(module_file(), "../cache", "cna_thresholded.RData")
+#    io$save(cna, file=fname)
+#}
