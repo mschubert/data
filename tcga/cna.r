@@ -8,7 +8,7 @@
 #'
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame with data for all the simple mutations
-cna = function(id_type="specimen", ...) {
+cna_gistic = function(id_type="specimen", ...) {
     .load("cache", "cna.RData") %>%
         .map_id(id_type=id_type, along="barcode", ...)
 }
