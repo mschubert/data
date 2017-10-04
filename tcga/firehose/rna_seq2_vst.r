@@ -3,7 +3,6 @@
 library(dplyr)
 b = import('ebits/base')
 io = import('ebits/io')
-ar = import('ebits/array')
 util = import('./util')
 rnaseq = import('ebits/process/rna-seq')
 
@@ -54,7 +53,7 @@ rna_seq2_vst = function(regex=archive_regex, dir=util$data_dir) {
 if (is.null(module_name())) {
     exprs = rna_seq2_vst()
     # need to allow overwrite here because some TCGA cohorts have same patient
-    bigmat = ar$stack(exprs, along=2, allow_overwrite=TRUE)
+    bigmat = narray::stack(exprs, along=2, allow_overwrite=TRUE)
     fname = file.path(module_file(), "../cache", "rna_seq2_vst.gctx")
     io$save(bigmat, file=fname)
 }

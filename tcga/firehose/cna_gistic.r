@@ -19,8 +19,8 @@ file2cna = function(fname, quiet=FALSE) {
         message(fname)
 
     re = io$read_table(fname, sep="\t", header=TRUE) %>%
-        tidyr::gather(key="barcode", value="gistic", -`Gene Symbol`, -`Locus ID`, -Cytoband) %>%
-        filter(gistic != 0)
+        tidyr::gather(key="barcode", value="gistic",
+                      -`Gene Symbol`, -`Locus ID`, -Cytoband)
 }
 
 #' Process all GISTIC CNA files
@@ -28,13 +28,9 @@ file2cna = function(fname, quiet=FALSE) {
 #' @param regex  Regular expression for archive files
 #' @param dir    Directory for archive dirs
 #' @return       Clinical data.frame if save is NULL
-cna = function(regex=archive_regex, dir=util$analyses_dir) {
-    clist = util$list_files(dir, regex) %>%
-        util$unpack() %>%
-        util$list_files("focal_data_by_genes\\.txt")
-
-    cna = lapply(clist, file2cna) %>%
-        setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", clist)) %>%
+process = function(fnames) {
+    cna = lapply(fnames, file2cna) %>%
+        setNames(b$grep("gdac.broadinstitute.org_([A-Z]+)", .)) %>%
         df$add_name_col("cohort", bind=TRUE) %>%
         transmute(cohort = cohort,
                   barcode = barcode,
@@ -45,7 +41,22 @@ cna = function(regex=archive_regex, dir=util$analyses_dir) {
 }
 
 if (is.null(module_name())) {
-    cna = cna()
-    fname = file.path(module_file(), "../cache", "cna.RData")
-    io$save(cna, file=fname)
+    files = util$list_files(util$analyses_dir, archive_regex) %>%
+        util$unpack()
+
+    # process focal amplifications
+    focal = util$list_files(files, "focal_data_by_genes\\.txt") %>%
+        process() %>%
+        narray::construct(gistic ~ hgnc + barcode,
+                          fun.aggregate = function(x) x[1])
+    fname = file.path(module_file(), "../cache", "cna_focal.gctx")
+    io$save(focal, file=fname)
+
+    # process all thresholded gistic
+    focal = util$list_files(files, "all_thresholded.by_genes\\.txt") %>%
+        process() %>%
+        narray::construct(gistic ~ hgnc + barcode,
+                          fun.aggregate = function(x) x[1])
+    fname = file.path(module_file(), "../cache", "cna_gistic.gctx")
+    io$save(focal, file=fname)
 }
