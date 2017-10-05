@@ -2,6 +2,7 @@ export_submodule('./barcode')
 export_submodule('./map_id')
 export_submodule('./filter')
 export_submodule('./cna')
+export_submodule('./mirna_seq')
 clinical = import('./clinical')$clinical
 cohorts = import('./cohorts')$cohorts
 mutations = import('./mutations')$mutations
