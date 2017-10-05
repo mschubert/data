@@ -10,7 +10,7 @@ analyses_dir = module_file("..", "data", "analyses__2016_01_28", mustWork=TRUE)
 #' @return       A character vector of matched files
 list_files = function(dir, regex) {
     fnames = list.files(dir, pattern=regex, full.names=TRUE, recursive=TRUE)
-    fnames[!grepl("gdac\\.broadinstitute\\.org_(COADREAD|GBMLGG|KIPAN|STES)", fnames)]
+    fnames[!grepl("gdac\\.broadinstitute\\.org_(COADREAD|GBMLGG|KIPAN|STES|FPPP)", fnames)]
 }
 
 #' Unpacks a Firehose archive and returns the directory
