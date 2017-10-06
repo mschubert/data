@@ -1,3 +1,5 @@
+include ../Makefile
+
 all: data/ReactomePathways.gmt
 
 data/ReactomePathways.gmt:

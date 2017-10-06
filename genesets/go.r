@@ -9,7 +9,7 @@ io = import('ebits/io')
 #' @return  
 go = function(names="both", genes="hgnc_symbol") {
     fname = file.path(module_file("cache", mustWork=TRUE),
-                      paste("go-", genes, ".RData"))
+                      paste0("go-", genes, ".RData"))
 
     if (file.exists(fname)) {
         sets = io$load(fname)
@@ -33,4 +33,8 @@ go = function(names="both", genes="hgnc_symbol") {
         sets$both = paste(sets$id, sets$name)
 
     unstack(sets[c(genes, names)])
+}
+
+if (is.null(module_name())) {
+    cache = go()
 }
