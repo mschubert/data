@@ -42,9 +42,10 @@ cna_gistic = function(tissue, id_type="specimen", thresh=FALSE, genes=TRUE, ...)
 #'
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return  Data.frame with 'Sample' ID and genomic regions
-cna_absolute = function(id_type="specimen", ...) {
+cna_absolute = function(tissue, id_type="specimen", ...) {
     fpath = module_file("data/pancan12_absolute.segtab.txt")
     stopifnot(file.exists(fpath))
     cna = readr::read_tsv(fpath) %>%
+        dplyr::filter(.bc$barcode2study(Sample) %in% tissue) %>%
         .map_id(id_type=id_type, along="Sample", ...)
 }
