@@ -1,73 +1,9 @@
 library(dplyr)
-.b = import('ebits/base')
-.io = import('ebits/io')
-.ar = import('ebits/array')
 .file = import('./file')
 cosmic = import('./cosmic')
+tissues = import('./tissues')$tissues
 drug = import('./drug')
-MASTER_LIST = cosmic$MASTER_LIST
 DRUG_PROPS = drug$DRUG_PROPS
-
-#' Returns a binary event matrix (BEM) for mutated genes
-bem = function() {
-    t(.io$load(module_file("cache", "BEMs", 'PANCAN_simple_MOBEM.rdata', mustWork=TRUE)))
-}
-
-#' Returns a matrix of frequency- and intogen-filtered mutated genes
-mutated_genes = function(frequency=0, intogen=FALSE, tissue=NULL, drop=FALSE) {
-    mut = t(.file$get('NGS_BEM')$logical)
-
-    if (!is.null(tissue))
-        mut = mut[rownames(mut) %in% names(tissues(tissue)),]
-
-    if (intogen) {
-        drivers = drivers(tissue=tissue)
-        mut = mut[,intersect(unique(drivers$HGNC), colnames(mut))]
-    }
-
-    if (frequency > 0)
-        mut = mut[,colSums(mut)/nrow(mut) > frequency]
-
-    if (drop)
-        mut = mut[,colSums(mut)>0]
-
-    mut
-}
-
-#' Returns a list of drivers for each tissue
-#'
-#' @param tissue  A vector of tissues to filter for
-#' @return        A list of drivers per tissue
-drivers = function(tissue=NULL) {
-    ig = .file$get('INTOGEN_DRIVERS')
-
-    if (!is.null(tissue)) {
-        if (tissue %in% c("COAD", "READ", "COADREAD"))
-            tissue = "COREAD"
-
-        ig = dplyr::filter(ig, Tumor_Type %in% tissue)
-    }
-
-    transmute(ig, HGNC=ActingDriver_Symbol, tissue=Tumor_Type)
-}
-
-#' Returns a gene expression matrix
-#'
-#' @param probes      Whether to return an expression values for each probe [FALSE]
-#' @param duplicated  Allow two arrays for the same cell line [defunct; TRUE]
-#' @return            A matrix with (genes x cell lines)
-basal_expression = function(probes=FALSE, duplicated=FALSE) {
-    if (probes) {
-        expr_set = .io$load(module_file("cache", "expr_probes.RData", mustWork=TRUE))
-        re = Biobase::exprs(expr_set)
-        colnames(re) = cosmic$name2id(Biobase::pData(expr_set)$Characteristics.cell.line., warn=FALSE)
-        re[,!duplicated(colnames(re))]
-    } else {
-        obj = .file$get('BASAL_EXPRESSION')
-        rownames(obj$DATA) = obj$GENE_SYMBOLS
-        obj$DATA[rownames(obj$DATA) != "",]
-    }
-}
 
 #' Returns a drug response matrix using the filters specified
 #'
@@ -147,31 +83,4 @@ drug_response = function(metric='IC50s', tissue=NULL, filter_cosmic=TRUE, drug_n
         SCREENING = SCREENING[,apply(SCREENING, 2, function(x) !all(is.na(x)))]
 
     SCREENING
-}
-
-#' Returns a vector of tissues, with COSMIC IDs as names
-#'
-#' @param tissue        Character vector of tissues to filter for
-#' @param unknown       Data type to encode unknown tissue; default: NA
-#' @param drop_unknown  Remove cell lines where tissue is unknown
-#' @param TCGA          Use TCGA tissue descriptors
-#' @param minN          Minimum number of cell lines to include per tissue
-tissues = function(tissue=NULL, unknown=NA, drop_unknown=TRUE, TCGA=TRUE, minN=2) {
-    stopifnot(!drop_unknown || is.na(unknown)) # if drop_unknown, unknown needs to be NA
-
-    if (TCGA)
-        tissueVec = as.character(MASTER_LIST$Study.Abbreviation) # v16 TCGA
-    else
-        tissueVec = as.character(MASTER_LIST$GDSC.description_1) # v16 tissues
-    names(tissueVec) = MASTER_LIST$COSMIC.ID # v16 cosmic id
-
-    tissueVec[is.na(tissueVec)] = unknown
-    tissueVec[tissueVec %in% c("unknown", "", "UNABLE TO CLASSIFY")] = unknown
-    tissueVec = na.omit(tissueVec)
-
-    if (!is.null(tissue))
-        tissueVec = tissueVec[tissueVec %in% tissue]
-
-    n = sapply(tissueVec, function(t) sum(t==tissueVec, na.rm=T))
-    tissueVec[n>=minN]
 }

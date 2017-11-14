@@ -2,10 +2,9 @@ plt = import('ebits/plot')
 b = import('ebits/base')
 ar = import('ebits/array')
 drug = import('../drug')
-data = import('../data_functions')
 
-tissues15 = data$tissues(minN=15)
-Ys = data$drug_response('IC50s')
+tissues15 = import('../tissues')$tissues(minN=15)
+Ys = import('../drug_response')$drug_response('IC50s')
 ar$intersect(tissues15, Ys, along=1)
 
 min_conc = drug$conc('min', colnames(Ys), log=TRUE)
