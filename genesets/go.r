@@ -8,7 +8,7 @@ io = import('ebits/io')
 #' @param genes  Identifier type for genes ('hgnc_symbol', 'entrezgene',
 #'               'ensembl_gene_id', etc.)
 #' @return  
-go = function(names="both", dset="hsapiens_gene_ensembl", genes="hgnc_symbol") {
+go = function(dset="hsapiens_gene_ensembl", genes="hgnc_symbol", as_list=FALSE) {
     fname = file.path(module_file("cache", mustWork=TRUE),
                       paste0(paste("go", dset, genes, sep="-"), ".RData"))
 
@@ -30,10 +30,11 @@ go = function(names="both", dset="hsapiens_gene_ensembl", genes="hgnc_symbol") {
         save(sets, file=fname)
     }
 
-    if (names == "both")
+    if (as_list) {
         sets$both = paste(sets$id, sets$name)
-
-    unstack(sets[c(genes, names)])
+        unstack(sets[c(genes, "both")])
+    } else
+        sets
 }
 
 if (is.null(module_name())) {
