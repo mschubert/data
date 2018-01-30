@@ -41,11 +41,18 @@ cna_gistic = function(tissue, id_type="specimen", thresh=FALSE, genes=TRUE, ...)
 #' this is from synapse: https://www.synapse.org/#!Synapse:syn1710464
 #'
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
+#' @param granges  Return GRanges object
 #' @return  Data.frame with 'Sample' ID and genomic regions
-cna_absolute = function(tissue, id_type="specimen", ...) {
+cna_absolute = function(tissue, id_type="specimen", granges=FALSE, ...) {
     fpath = module_file("data/pancan12_absolute.segtab.txt")
     stopifnot(file.exists(fpath))
     cna = readr::read_tsv(fpath) %>%
         dplyr::filter(.bc$barcode2study(Sample) %in% tissue) %>%
         .map_id(id_type=id_type, along="Sample", ...)
+
+    if (granges)
+        cna = GenomicRanges::makeGRangesFromDataFrame(cna,
+            start.field="Start", end.field="End", keep.extra.columns=TRUE)
+
+    cna
 }
