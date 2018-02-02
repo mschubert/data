@@ -4,12 +4,14 @@
 #' Get a matrix for all RNA-seq measurements
 #'
 #' @param tissue   The tissue(s) to get expression for
+#' @param type     Expression measure ('raw' counts, 'cpm', 'log2cpm', 'vst', 'voom')
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @param genes    Genes to retrieve (default: all)
 #' @return         A matrix with HGNC symbols x TCGA samples
-rna_seq = function(tissue, id_type="specimen", genes=TRUE, ...) {
+rna_seq = function(tissue, type="vst", id_type="specimen", genes=TRUE, ...) {
     library(methods) # required; otherwise h5 error
-    file = h5::h5file(module_file("cache", "rna_seq2_vst.gctx"), mode="r")
+    fname = sprintf("rna_seq2_%s.gctx", type)
+    file = h5::h5file(module_file("cache", fname), mode="r")
 
     barcodes = file["/0/META/COL/id"][]
     studies = .bc$barcode2study(barcodes)
