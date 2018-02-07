@@ -1,42 +1,26 @@
+.io = import('io')
 .bc = import('./barcode')
 .map_id = import('./map_id')$map_id
 
 #' Get a matrix for all RNA-seq measurements
 #'
+#' docs: https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/Expression_mRNA_Pipeline/
+#'
 #' @param tissue   The tissue(s) to get expression for
-#' @param type     Expression measure ('raw' counts, 'cpm', 'log2cpm', 'vst', 'voom')
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
-#' @param genes    Genes to retrieve (default: all)
+#' @param trans    Value transformation: 'raw', 'log2cpm', 'vst' (default: raw read counts)
+#' @param annot    Return SummarizedExperiment annotations or matrix w/ 'external_gene_name'
 #' @return         A matrix with HGNC symbols x TCGA samples
-rna_seq = function(tissue, type="vst", id_type="specimen", genes=TRUE, ...) {
-    library(methods) # required; otherwise h5 error
-    fname = sprintf("rna_seq2_%s.gctx", type)
-    file = h5::h5file(module_file("cache", fname), mode="r")
+rna_seq = function(tissue, id_type="specimen", trans="raw", annot=FALSE) {
+    fpath = module_file(paste0("biolinks/rna_seq_", trans))
+    expr = .io$load(file.path(fpath, paste0("TCGA-", tissue, ".RData")))
 
-    barcodes = file["/0/META/COL/id"][]
-    studies = .bc$barcode2study(barcodes)
-    sample_idx = which(studies %in% tissue)
-
-    all_genes = file["/0/META/ROW/id"][]
-    if (identical(genes, TRUE))
-        gene_idx = seq_along(all_genes)
-    else
-        gene_idx = match(genes, all_genes)
-
-    data = file["/0/DATA/0/matrix"][sample_idx, gene_idx]
-    rownames(data) = barcodes[sample_idx]
-    colnames(data) = all_genes[gene_idx]
-
-    h5::h5close(file)
-    .map_id(t(data), id_type=id_type, ...)
-}
-
-if (is.null(module_name())) {
-    library(testthat)
-
-    import('./rna_seq', attach=TRUE)
-    expr = rna_seq("ACC", genes=c("TP53", "KRAS"))
-
-    expect_true(all(.bc$is_barcode(colnames(expr))))
-    expect_equal(rownames(expr), c("TP53", "KRAS"))
+    if (identical(annot, TRUE))
+        expr
+    else {
+        re = .map_id(SummarizedExperiment::assay(expr), id_type=id_type)
+        if (is.character(annot))
+            rownames(re) = SummarizedExperiment::rowData(expr)[[annot]]
+        re
+    }
 }
