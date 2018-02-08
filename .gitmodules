@@ -1,0 +1,3 @@
+[submodule "tcga/TCGAbiolinks-downloader"]
+	path = tcga/TCGAbiolinks-downloader
+	url = git@github.com:mschubert/TCGAbiolinks-downloader.git

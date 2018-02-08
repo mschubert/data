@@ -12,7 +12,7 @@
 #' @param annot    Return SummarizedExperiment annotations or matrix w/ 'external_gene_name'
 #' @return         A matrix with HGNC symbols x TCGA samples
 rna_seq = function(tissue, id_type="specimen", trans="raw", annot=FALSE) {
-    fpath = module_file(paste0("biolinks/rna_seq_", trans))
+    fpath = module_file(paste0("TCGAbiolinks-downloader/rna_seq_", trans))
     expr = .io$load(file.path(fpath, paste0("TCGA-", tissue, ".RData")))
 
     if (identical(annot, TRUE))

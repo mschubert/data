@@ -11,7 +11,7 @@
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame or GRanges object (Segment_Mean is log2(copy-number)-1)
 cna_segments = function(tissue, id_type="specimen", granges=FALSE) {
-    fpath = module_file("biolinks/cnv_segments")
+    fpath = module_file("TCGAbiolinks-downloader/cnv_segments")
     cna = .io$load(file.path(fpath, paste0("TCGA-", tissue, ".RData"))) %>%
         .map_id(id_type=id_type, along="Sample") %>%
         dplyr::mutate(ploidy = 1 + 2^Segment_Mean)
