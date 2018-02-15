@@ -14,7 +14,7 @@ purity = function(tissue, id_type="specimen", granges=FALSE) {
     fpath = module_file("TCGAbiolinks-downloader")
     purity = readxl::read_excel(file.path(fpath, "ncomms9971-s2.xlsx"), skip=3) %>%
         dplyr::transmute(cohort = `Cancer type`,
-                         sample = `Sample ID`,
+                         Sample = `Sample ID`,
                          estimate = nan2na_num(ESTIMATE),
                          absolute = nan2na_num(ABSOLUTE),
                          lump = nan2na_num(LUMP),
