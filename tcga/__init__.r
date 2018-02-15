@@ -11,3 +11,4 @@ rna_seq_genes = import('./rna_seq_genes')$rna_seq_genes
 rppa = import('./rppa')$rppa
 bem = import('./bem')$bem
 intersect = import('./intersect')$intersect
+purity = import('./purity')$purity
