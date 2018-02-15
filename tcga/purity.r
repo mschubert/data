@@ -8,7 +8,7 @@
 #' @param tissue   The tissue(s) to get expression for
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @return         A data.frame or GRanges object (Segment_Mean is log2(copy-number)-1)
-purity = function(tissue, id_type="specimen", granges=FALSE) {
+purity = function(tissue=NULL, id_type="specimen", granges=FALSE) {
     nan2na_num = function(x) as.numeric(ifelse(is.nan(x), NA, x))
 
     fpath = module_file("TCGAbiolinks-downloader")
@@ -20,5 +20,10 @@ purity = function(tissue, id_type="specimen", granges=FALSE) {
                          lump = nan2na_num(LUMP),
                          IHC = nan2na_num(IHC),
                          CPE = nan2na_num(CPE)) %>%
-        .map_id(id_type=id_type, along="sample")
+        .map_id(id_type=id_type, along="Sample")
+
+    if (is.null(tissue))
+        purity
+    else
+        dplyr::filter(purity, cohort %in% tissue)
 }
