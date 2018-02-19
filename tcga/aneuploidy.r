@@ -1,0 +1,15 @@
+library(dplyr)
+library(magrittr)
+sys = import('sys')
+seq = import('seq')
+
+#' Provide AneuFinder-like aneuploidy score
+#'
+#' @param ranges  GRanges object returned by to_granges function
+#' @param per_chromosome  Calculate aneuploidy score per chromosome or genome
+#' @param ...     Arguments passed to `seq$aneuploidy`
+#' @return  ...
+aneuploidy = function(cohort=NULL, assembly="GRCh38", per_chromosome=FALSE, ...) {
+    cna = tcga$cna_segments(cohort) %>%
+        seq$aneuploidy(assembly=assembly, per_chromosome=per_chromosome, ...)
+}

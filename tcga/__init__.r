@@ -13,3 +13,4 @@ rppa = import('./rppa')$rppa
 bem = import('./bem')$bem
 intersect = import('./intersect')$intersect
 purity = import('./purity')$purity
+aneuploidy = import('./aneuploidy')$aneuploidy
