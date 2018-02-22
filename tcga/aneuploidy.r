@@ -1,5 +1,4 @@
-library(dplyr)
-library(magrittr)
+`%>%` = magrittr::`%>%`
 sys = import('sys')
 seq = import('seq')
 
@@ -11,5 +10,7 @@ seq = import('seq')
 #' @return  ...
 aneuploidy = function(cohort=NULL, assembly="GRCh38", per_chromosome=FALSE, ...) {
     cna = tcga$cna_segments(cohort) %>%
-        seq$aneuploidy(assembly=assembly, per_chromosome=per_chromosome, ...)
+        dplyr::mutate(width = abs(End - Start)) %>%
+        seq$aneuploidy(assembly=assembly, per_chromosome=per_chromosome,
+                       sample="Sample", seqnames="Chromosome")
 }
