@@ -6,7 +6,7 @@
 #' Will work on character vectors ()
 #'
 #' @param x        An array or data.frame
-#' @param ...      If is.data.frame(x) the field, empty otherwise
+#' @param along    The dimension index, name, or field name to filter along
 #' @param vial     Limit to a portion (e.g. 'A', 'B', etc., 1 if lowest letter or NULL for all)
 #' @param primary  Limit to primary samples (solid tumor, blood cancer, bone marrow)
 #' @param normal   Limit to normals of the same tissue
@@ -14,29 +14,28 @@
 #' @param tumor    Limit to tumors
 #' @param tissue   Character vector of TCGA identifiers
 #' @param matched  Return only samples for which there is a matched cancer/normal available
-#' @param along    If a matrix, which dimension to filter along
 #' @return         The object subset with barcodes that match filters
-filter = function(x, ..., vial=NULL, primary=NULL, normal=NULL,
+filter = function(x, along=NULL, vial=NULL, primary=NULL, normal=NULL,
                   blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
-                  include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
+                  include_cell_lines=FALSE, include_xenografts=FALSE) {
 
     UseMethod("filter")
 }
 
-filter.data.frame = function(x, ..., vial=NULL, primary=NULL, normal=NULL,
+filter.data.frame = function(x, along, vial=NULL, primary=NULL, normal=NULL,
                              blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
-                             include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
+                             include_cell_lines=FALSE, include_xenografts=FALSE) {
 
     args = as.list(.b$match_call_defaults())[-1]
-    args$x = x[[args[[2]]]]
+    args$x = x[[args[["along"]]]]
     args[[2]] = NULL
     x[do.call(filter, args),]
 }
 
 # matrices and arrays
-filter.matrix = function(x, vial=NULL, primary=NULL, normal=NULL,
+filter.matrix = function(x, along=2, vial=NULL, primary=NULL, normal=NULL,
                          blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
-                         include_cell_lines=FALSE, include_xenografts=FALSE, along=2) {
+                         include_cell_lines=FALSE, include_xenografts=FALSE) {
 
     args = as.list(.b$match_call_defaults())[-1]
 
@@ -51,9 +50,9 @@ filter.matrix = function(x, vial=NULL, primary=NULL, normal=NULL,
 }
 
 # vectors and lists
-filter.default = function(x, vial=NULL, primary=NULL, normal=NULL,
+filter.default = function(x, along=NULL, vial=NULL, primary=NULL, normal=NULL,
                           blood_normal=NULL, cancer=NULL, tissue=NULL, matched=NULL,
-                          include_cell_lines=FALSE, include_xenografts=FALSE, along=NULL) {
+                          include_cell_lines=FALSE, include_xenografts=FALSE) {
 
     .bc$must_barcode(x)
     fields = .bc$barcode2index(x)
