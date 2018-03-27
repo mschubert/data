@@ -11,14 +11,13 @@ filter = function(genesets, ...) {
 }
 
 filter.list = function(genesets, valid=NULL, min=5, max=500, warn=TRUE) {
-    if (any(is.na(valid)))
-        warning("NA found in valid set")
-    if (any(valid == ""))
-        warning("empty identifier found in valid set")
-
-    if (length(valid) > 0)
+    if (!is.null(valid)) {
+        if (any(is.na(valid)))
+            warning("NA found in valid set")
+        if (any(valid == ""))
+            warning("empty identifier found in valid set")
         genesets = lapply(genesets, function(x) intersect(x, valid))
-    else
+    } else
         genesets = lapply(genesets, function(x) setdiff(na.omit(x), ""))
 
     num_overlap = sapply(genesets, length)
@@ -38,10 +37,13 @@ filter.list = function(genesets, valid=NULL, min=5, max=500, warn=TRUE) {
 
 filter.data.frame = function(genesets, valid=NULL, min=5, max=500, warn=TRUE,
                              set="id", gene="hgnc_symbol") {
-    if (any(is.na(valid)))
-        warning("NA found in valid set")
-    if (any(valid == ""))
-        warning("empty identifier found in valid set")
+    if (!is.null(valid)) {
+        if (any(is.na(valid)))
+            warning("NA found in valid set")
+        if (any(valid == ""))
+            warning("empty identifier found in valid set")
+        genesets = genesets[genesets[[gene]] %in% valid,]
+    }
     if (! set %in% colnames(genesets))
         stop("variable 'set' needs to reference the gene set column")
     if (! gene %in% colnames(genesets))
@@ -50,9 +52,6 @@ filter.data.frame = function(genesets, valid=NULL, min=5, max=500, warn=TRUE,
     set_s = rlang::sym(set)
     gene_s = rlang::sym(gene)
     all_sets = unique(genesets[[set]])
-
-    if (!is.null(valid))
-        genesets = genesets[genesets[[gene]] %in% valid,]
 
     # dplyr::n() does not work here (direct all implemented as error)
     re = genesets %>%
