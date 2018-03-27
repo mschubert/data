@@ -59,7 +59,8 @@ filter.data.frame = function(genesets, valid=NULL, min=5, max=500, warn=TRUE,
         dplyr::distinct() %>%
         dplyr::group_by(!! set_s) %>%
         dplyr::filter(dplyr::n_distinct(!! gene_s) >= min &
-                      dplyr::n_distinct(!! gene_s) <= max)
+                      dplyr::n_distinct(!! gene_s) <= max) %>%
+        dplyr::ungroup()
 
     discard = setdiff(all_sets, re[[set]])
 
