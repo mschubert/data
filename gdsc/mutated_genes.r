@@ -1,5 +1,6 @@
 .file = import('./file')
 tissues = import('./tissues')$tissues
+drivers = import('./drivers')$drivers
 
 #' Returns a matrix of frequency- and intogen-filtered mutated genes
 mutated_genes = function(frequency=0, intogen=FALSE, tissue=NULL, drop=FALSE) {
