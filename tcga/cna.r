@@ -40,7 +40,7 @@ cna_genes = function(tissue, id_type="specimen", gene="ensembl_gene_id",
         stop("only id_type='specimen' implemented with caching")
 
     if (file.exists(fpath)) {
-        dset = .io$load(fname)
+        dset = .io$load(fpath)
         genes = dset$genes
         copies = dset$copies
     } else {
@@ -64,7 +64,7 @@ cna_genes = function(tissue, id_type="specimen", gene="ensembl_gene_id",
     }
 
     if (length(chr_excl) > 0) {
-        keep = as.data.frame(GenomicRanges::mcols(genes)) %>%
+        keep = as.data.frame(genes) %>%
             dplyr::filter(! seqnames %in% chr_excl)
         copies = copies[, colnames(copies) %in% keep[[gene]]]
     }
