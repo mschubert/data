@@ -6,4 +6,5 @@ drug = import('./drug')
 drug_response = import('./drug_response')$drug_response
 bem = import('./bem')$bem
 cosmic = import('./cosmic')
+aneuploidy = import('./aneuploidy')$aneuploidy
 plot = import('./plot')

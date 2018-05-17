@@ -8,9 +8,8 @@ drivers = function(tissue=NULL) {
     ig = .file$get('INTOGEN_DRIVERS')
 
     if (!is.null(tissue)) {
-        if (tissue %in% c("COAD", "READ", "COADREAD"))
-            tissue = "COREAD"
-
+        is_coread = tissue %in% c("COAD", "READ", "COADREAD")
+        tissue[is_coread] = "COREAD"
         ig = dplyr::filter(ig, Tumor_Type %in% tissue)
     }
 
