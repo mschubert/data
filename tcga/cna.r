@@ -66,7 +66,7 @@ cna_genes = function(tissue, id_type="specimen", gene="ensembl_gene_id",
     if (length(chr_excl) > 0) {
         keep = as.data.frame(genes) %>%
             dplyr::filter(! seqnames %in% chr_excl)
-        copies = copies[, colnames(copies) %in% keep[[gene]]]
+        copies = copies[rownames(copies) %in% keep[[gene]],]
     }
     copies
 }
