@@ -34,7 +34,7 @@ cna_segments = function(tissue, id_type="specimen", granges=FALSE) {
 #' @return         A matrix of gene copy number variations
 cna_genes = function(tissue, id_type="specimen", gene="ensembl_gene_id",
                      chr_excl=c("Y","MT")) {
-    fname = sprintf("cn_%s-%s.RData", tissue, gene)
+    fname = sprintf("cna-%s/%s.RData", gene, tissue)
     fpath = file.path(module_file(), "cache", fname)
     if (id_type != "specimen")
         stop("only id_type='specimen' implemented with caching")
