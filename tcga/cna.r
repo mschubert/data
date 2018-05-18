@@ -34,39 +34,71 @@ cna_segments = function(tissue, id_type="specimen", granges=FALSE) {
 #' @return         A matrix of gene copy number variations
 cna_genes = function(tissue, id_type="specimen", gene="ensembl_gene_id",
                      chr_excl=c("Y","MT")) {
-    fname = sprintf("cna-%s/%s.RData", gene, tissue)
-    fpath = file.path(module_file(), "cache", fname)
     if (id_type != "specimen")
         stop("only id_type='specimen' implemented with caching")
 
-    if (file.exists(fpath)) {
-        dset = .io$load(fpath)
-        genes = dset$genes
-        copies = dset$copies
-    } else {
-        warning("no cache file found, this may take a long time",
-                immediate.=TRUE)
-
-        genes = .seq$coords$gene(idtype=gene, granges=TRUE)
-        cnas = cna_segments(tissue, id_type=id_type, granges=TRUE) %>%
-            plyranges::select(Sample, ploidy)
-
-        copy_ranges = genes %>%
-            plyranges::select(!! rlang::sym(gene)) %>%
-            plyranges::join_overlap_intersect(cnas) %>%
-            as.data.frame() %>% # plyranges takes >50GB of mem, why? (#36)
-            dplyr::mutate(width = abs(start - end)) %>%
-            dplyr::group_by(Sample, ensembl_gene_id) %>%
-            dplyr::summarize(copies = weighted.mean(ploidy, width))
-
-        copies = narray::construct(copies ~ ensembl_gene_id + Sample, data=copy_ranges)
-        save(genes, copies, file=fpath)
+    fpath = .cache_file(tissue, gene)
+    if (file.exists(fpath))
+        obj = .io$load(fpath)
+    else {
+        warning("no cache file found, this may take a long time", immediate.=TRUE)
+        obj = .make_cache(cohort=tissue, feat_id=gene, fpath=fpath,
+                          feat_ranges=.seq$coords$gene(idtype=gene, granges=TRUE))
     }
+    .filter(obj, gene, chr_excl=chr_excl)
+}
 
+#' Make copy number cache of features
+#'
+#' @param fpath        File path of where to store the cache
+#' @param cohort       Character vector of TCGA cohort, e.g. 'BRCA'
+#' @param feat_id      Character string to serve as identifier, e.g. 'ensembl_gene_id'
+#' @param feat_ranges  GRanges object with `feat_id` as column
+#' @return             Contents of the cached file
+.make_cache = function(fpath, cohort, feat_id, feat_ranges) {
+    fsym = rlang::sym(feat_id)
+
+    cnas = cna_segments(cohort, id_type='specimen', granges=TRUE) %>%
+        plyranges::select(Sample, ploidy)
+
+    copy_ranges = feat_ranges %>%
+        plyranges::select(!! fsym) %>%
+        plyranges::join_overlap_intersect(cnas) %>%
+        as.data.frame() %>% # plyranges takes >50GB of mem, why? (#36)
+        dplyr::mutate(width = abs(start - end)) %>%
+        dplyr::group_by(Sample, !! fsym) %>%
+        dplyr::summarize(copies = weighted.mean(ploidy, width))
+
+    fml = as.formula(sprintf("copies ~ %s + Sample", feat_id))
+    copies = narray::construct(fml, data=copy_ranges)
+    save(feat_ranges, copies, file=fpath)
+    list(feat_ranges, copies)
+}
+
+#' Return cache file path
+#'
+#' @param cohort   Character vector of TCGA cohort, e.g. 'BRCA'
+#' @param feat_id  Character string to serve as identifier, e.g. 'ensembl_gene_id'
+#' @return         Character string of the cache file path
+.cache_file = function(cohort, feat_id) {
+    fdir = file.path(module_file(), "cache", sprintf("cna-%s", feat_id))
+    if (!dir.exists(fdir))
+        dir.create(fdir)
+    file.path(fdir, sprintf("%s.RData", cohort))
+}
+
+#' Return (filtered) cache
+#'
+#' @param obj  List with columns: feat_ranges [GRanges], copies [matrix, feat x sample]
+#' @param feat_id  Character string to serve as identifier, e.g. 'ensembl_gene_id'
+#' @param chr_excl  Chromosomes to exclude; default: Y,MT
+#' @return  A filtered copy number matrix [features x samples]
+.filter = function(obj, feat_id, chr_excl=c('Y', 'MT')) {
+    copies = obj$copies
     if (length(chr_excl) > 0) {
-        keep = as.data.frame(genes) %>%
+        keep = as.data.frame(obj$feat_ranges) %>%
             dplyr::filter(! seqnames %in% chr_excl)
-        copies = copies[rownames(copies) %in% keep[[gene]],]
+        copies = copies[rownames(copies) %in% keep[[feat_id]],]
     }
     copies
 }
