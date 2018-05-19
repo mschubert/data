@@ -41,11 +41,41 @@ cna_genes = function(tissue, id_type="specimen", gene="ensembl_gene_id",
     if (file.exists(fpath))
         obj = .io$load(fpath)
     else {
-        warning("no cache file found, this may take a long time", immediate.=TRUE)
+        warning("no cache file found, this may take a long time", immediate.=true)
         obj = .make_cache(cohort=tissue, feat_id=gene, fpath=fpath,
-                          feat_ranges=.seq$coords$gene(idtype=gene, granges=TRUE))
+            feat_ranges=.seq$coords$gene(idtype=gene, granges=true))
     }
     .filter(obj, gene, chr_excl=chr_excl)
+}
+
+cna_chrs = function(cohort, id_type="specimen", chr_excl=c("Y","MT")) {
+    fpath = .cache_file(cohort, "chrs")
+    if (file.exists(fpath))
+        obj = .io$load(fpath)
+    else
+        obj = .make_cache(cohort=cohort, feat_id="chrs", fpath=fpath,
+            feat_ranges=.seq$coords$chrs(granges=TRUE))
+    .filter(obj, "chrs", chr_excl=chr_excl)
+}
+
+cna_chr_arms = function(cohort, id_type="specimen", chr_excl=c("Y","MT")) {
+    fpath = .cache_file(cohort, "arm")
+    if (file.exists(fpath))
+        obj = .io$load(fpath)
+    else
+        obj = .make_cache(cohort=cohort, feat_id="arm", fpath=fpath,
+            feat_ranges=.seq$coords$chr_arms(granges=TRUE))
+    .filter(obj, "arm", chr_excl=chr_excl)
+}
+
+cna_bands = function(cohort, id_type="specimen", chr_excl=c("Y","MT")) {
+    fpath = .cache_file(cohort, "bands")
+    if (file.exists(fpath))
+        obj = .io$load(fpath)
+    else
+        obj = .make_cache(cohort=cohort, feat_id="band", fpath=fpath,
+            feat_ranges=.seq$coords$chr_bands(granges=TRUE))
+    .filter(obj, "band", chr_excl=chr_excl)
 }
 
 #' Make copy number cache of features
