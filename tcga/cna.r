@@ -97,7 +97,7 @@ cna_bands = function(cohort, id_type="specimen", chr_excl=c("Y","MT")) {
         as.data.frame() %>% # plyranges takes >50GB of mem, why? (#36)
         dplyr::mutate(width = abs(start - end)) %>%
         dplyr::group_by(Sample, !! fsym) %>%
-        dplyr::summarize(copies = weighted.mean(ploidy, width))
+        dplyr::summarize(copies = weighted.mean(ploidy, width, na.rm=TRUE))
 
     fml = as.formula(sprintf("copies ~ %s + Sample", feat_id))
     copies = narray::construct(fml, data=copy_ranges)
