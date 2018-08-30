@@ -10,7 +10,7 @@ filter = function(genesets, ...) {
     UseMethod("filter")
 }
 
-filter.list = function(genesets, valid=NULL, min=5, max=500, warn=TRUE) {
+filter.list = function(genesets, valid=NULL, min=2, max=Inf, warn=TRUE) {
     if (!is.null(valid)) {
         if (any(is.na(valid)))
             warning("NA found in valid set")
@@ -35,7 +35,7 @@ filter.list = function(genesets, valid=NULL, min=5, max=500, warn=TRUE) {
     genesets
 }
 
-filter.data.frame = function(genesets, valid=NULL, min=5, max=500, warn=TRUE,
+filter.data.frame = function(genesets, valid=NULL, min=2, max=Inf, warn=TRUE,
                              set="id", gene="hgnc_symbol") {
     if (!is.null(valid)) {
         if (any(is.na(valid)))
