@@ -78,14 +78,14 @@ cna_bands = function(cohort, id_type="specimen", chr_excl=c("Y","MT")) {
     .filter(obj, "band", chr_excl=chr_excl)
 }
 
-#' Make copy number cache of features
+#' Get copy numbers for a custom feature set
 #'
-#' @param fpath        File path of where to store the cache
 #' @param cohort       Character vector of TCGA cohort, e.g. 'BRCA'
-#' @param feat_id      Character string to serve as identifier, e.g. 'ensembl_gene_id'
+#' @param feat_id      Column name of GRanges to use as idenitifer
 #' @param feat_ranges  GRanges object with `feat_id` as column
-#' @return             Contents of the cached file
-.make_cache = function(fpath, cohort, feat_id, feat_ranges) {
+#' @param as_array     logical, indicating on whether to convert result to matrix
+#' @return             Copy number object
+cna_custom = function(cohort, feat_id, feat_ranges, as_array=TRUE) {
     fsym = rlang::sym(feat_id)
 
     cnas = cna_segments(cohort, id_type='specimen', granges=TRUE) %>%
@@ -94,13 +94,28 @@ cna_bands = function(cohort, id_type="specimen", chr_excl=c("Y","MT")) {
     copy_ranges = feat_ranges %>%
         plyranges::select(!! fsym) %>%
         plyranges::join_overlap_intersect(cnas) %>%
-        as.data.frame() %>% # plyranges takes >50GB of mem, why? (#36)
+        as.data.frame() %>%
         dplyr::mutate(width = abs(start - end)) %>%
         dplyr::group_by(Sample, !! fsym) %>%
         dplyr::summarize(copies = weighted.mean(ploidy, width, na.rm=TRUE))
 
-    fml = as.formula(sprintf("copies ~ %s + Sample", feat_id))
-    copies = narray::construct(fml, data=copy_ranges)
+    if (as_array) {
+        fml = as.formula(sprintf("copies ~ %s + Sample", feat_id))
+        copy_ranges = narray::construct(fml, data=copy_ranges)
+    }
+
+    copy_ranges
+}
+
+#' Make copy number cache of features
+#'
+#' @param fpath        File path of where to store the cache
+#' @param cohort       Character vector of TCGA cohort, e.g. 'BRCA'
+#' @param feat_id      Character string to serve as identifier, e.g. 'ensembl_gene_id'
+#' @param feat_ranges  GRanges object with `feat_id` as column
+#' @return             Contents of the cached file
+.make_cache = function(fpath, cohort, feat_id, feat_ranges) {
+    copies = cna_custom(cohort, feat_id, feat_ranges, as_array=TRUE)
     save(feat_ranges, copies, file=fpath)
     list(feat_ranges, copies)
 }
