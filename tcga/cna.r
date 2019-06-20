@@ -41,9 +41,9 @@ cna_genes = function(tissue, id_type="specimen", gene="ensembl_gene_id",
     if (file.exists(fpath))
         obj = .io$load(fpath)
     else {
-        warning("no cache file found, this may take a long time", immediate.=true)
+        warning("no cache file found, this may take a long time", immediate.=TRUE)
         obj = .make_cache(cohort=tissue, feat_id=gene, fpath=fpath,
-            feat_ranges=.seq$coords$gene(idtype=gene, granges=true))
+            feat_ranges=.seq$coords$gene(idtype=gene, granges=TRUE))
     }
     .filter(obj, gene, chr_excl=chr_excl)
 }
