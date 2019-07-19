@@ -1,4 +1,3 @@
-library(plyranges) # TODO: remove when sa-lee/plyranges#36 is fixed
 `%>%` = magrittr::`%>%`
 .io = import('io')
 .bc = import('./barcode')
