@@ -22,8 +22,15 @@ methylation = function(tissue, id_type="specimen", cpg=c("stdev", "avg"),
     all_genes = file["/0/META/ROW/id"][]
     if (identical(genes, TRUE))
         gene_idx = seq_along(all_genes)
-    else
+    else {
         gene_idx = match(genes, all_genes)
+        no_match = is.na(gene_idx)
+        if (any(no_match)) {
+            warning("No data for genes: ", paste(genes[no_match], collapse=", "),
+                    immediate.=TRUE)
+            gene_idx = gene_idx[!no_match]
+        }
+    }
 
     data = file["/0/DATA/0/matrix"][sample_idx, gene_idx]
     rownames(data) = barcodes[sample_idx]

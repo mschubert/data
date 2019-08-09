@@ -14,3 +14,4 @@ bem = import('./bem')$bem
 intersect = import('./intersect')$intersect
 purity = import('./purity')$purity
 aneuploidy = import('./aneuploidy')$aneuploidy
+meth = import('./methylation')$methylation
