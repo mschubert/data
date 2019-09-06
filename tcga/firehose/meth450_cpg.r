@@ -43,7 +43,7 @@ meth450_cpg = function(regex=archive_regex, dir=util$data_dir) {
 if (is.null(module_name())) {
     exprs = meth450_cpg()
     # need to allow overwrite here because some TCGA cohorts have same patient
-    bigmat = narray::stack(exprs, along=2)
+    bigmat = narray::stack(exprs, along=2, allow_overwrite=TRUE)
     fname = file.path(module_file(), "../cache", "meth450_cpg.gctx")
     io$save(bigmat, file=fname)
 }

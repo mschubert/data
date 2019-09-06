@@ -46,7 +46,7 @@ rna_exon = function(regex=archive_regex, dir=util$data_dir) {
 if (is.null(module_name())) {
     exprs = rna_exon()
     # need to allow overwrite here because some TCGA cohorts have same patient
-    bigmat = narray::stack(exprs, along=2)
+    bigmat = narray::stack(exprs, along=2, allow_overwrite=TRUE)
     fname = file.path(module_file(), "../cache", "rna_exon.gctx")
     io$save(bigmat, file=fname)
 }
