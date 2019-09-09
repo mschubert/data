@@ -13,7 +13,7 @@
 #' @param trans    Value transformation: 'raw', 'log2cpm', 'vst' (default: raw read counts)
 #' @param annot    Return SummarizedExperiment annotations or matrix w/ 'external_gene_name'
 #' @return         A matrix with HGNC symbols x TCGA samples
-rna_seq = function(tissue, id_type="specimen", trans="raw", annot=FALSE) {
+rna_exon = function(tissue, id_type="specimen", trans="raw", annot=FALSE) {
     fpath = module_file(paste0("TCGAbiolinks-downloader/rna_exon_", trans))
     expr = .io$load(file.path(fpath, paste0("TCGA-", tissue, ".RData")))
 
@@ -43,8 +43,8 @@ rna_seq = function(tissue, id_type="specimen", trans="raw", annot=FALSE) {
         dannot = readRDS(fannot)
 
     # add annotations to row data
-    annot = dannot[match(rownames(expr), dannot$name),]
-    GenomicRanges::mcols(expr@rowRanges) = annot[c("ensembl_exon_id", "ensembl_gene_id", "external_gene_name")]
+    adf = dannot[match(rownames(expr), dannot$name),]
+    GenomicRanges::mcols(expr@rowRanges) = adf[c("ensembl_exon_id", "ensembl_gene_id", "external_gene_name")]
 
     if (identical(annot, TRUE))
         expr
