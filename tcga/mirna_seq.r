@@ -3,7 +3,7 @@
 .filter = import('./filter')$filter
 .map_id = import('./map_id')$map_id
 
-load = function(...) .io$load(module_file(..., mustWork=TRUE))
+.load = function(...) .io$load(module_file(..., mustWork=TRUE))
 
 #' Get a matrix with miRNA expression (variance-stabilization transformed)
 #'
