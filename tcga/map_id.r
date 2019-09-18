@@ -15,7 +15,7 @@ subset_ids = setNames(c("01A"), subset_types)
 #' Maps barcodes to a specific identifier type
 map_id = function(obj, id_type, subset, drop, ...) UseMethod("map_id")
 
-map_id.character = function(obj, id_type=NULL, subset=NULL, drop=TRUE, ...) {
+map_id.character = function(obj, id_type=NULL, subset=NULL, drop=FALSE, ...) {
     if (!is.null(subset) && ! subset %in% subset_types)
         stop("Invalid subset. Choose one of: ", paste(subset_types, sep=", "))
 
@@ -37,7 +37,7 @@ map_id.character = function(obj, id_type=NULL, subset=NULL, drop=TRUE, ...) {
     }
 }
 
-map_id.matrix = function(obj, id_type=NULL, along=2, subset=NULL, drop=TRUE) {
+map_id.matrix = function(obj, id_type=NULL, along=2, subset=NULL, drop=FALSE) {
     ids = map_id(dimnames(obj)[[along]], id_type=id_type, subset=subset, drop=FALSE)
     keep = !is.na(ids)
 
@@ -56,7 +56,7 @@ map_id.matrix = function(obj, id_type=NULL, along=2, subset=NULL, drop=TRUE) {
     }
 }
 
-map_id.data.frame = function(obj, along, id_type=NULL, subset=NULL, drop=TRUE) {
+map_id.data.frame = function(obj, along, id_type=NULL, subset=NULL, drop=FALSE) {
     if (is.numeric(along))
         map_id.matrix(obj, id_type=id_type, subset=subset, along=along, drop=drop)
     else {
