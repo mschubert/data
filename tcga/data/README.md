@@ -24,3 +24,7 @@ http://www.cancerrxgene.org/gdsc1000/GDSC1000_WebResources/Home.html
 ## ABSOLUTE copy numbers
 
 https://www.synapse.org/#!Synapse:syn1710464
+
+## Pan-cancer immune table
+
+Thorsson et al, Immunity 2018: 1-s2.0-S1074761318301213-mmc2.xlsx

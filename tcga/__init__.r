@@ -17,3 +17,4 @@ purity = import('./purity')$purity
 aneuploidy = import('./aneuploidy')$aneuploidy
 meth = import('./methylation')$methylation
 meth_cpg = import('./meth_cpg')$meth_cpg
+immune = import('./immune')$immune
