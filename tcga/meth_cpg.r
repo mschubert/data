@@ -1,6 +1,7 @@
 .io = import('io')
 .bc = import('./barcode')
 .map_id = import('./map_id')$map_id
+`%>%` = magrittr::`%>%`
 
 #' Get a matrix for all CpG methylation beta values
 #'
@@ -22,4 +23,37 @@ meth_cpg = function(tissue, id_type="specimen", annot=FALSE) {
             rownames(re) = SummarizedExperiment::rowData(meth)[[annot]]
         re
     }
+}
+
+#' Core promoter element of CpGs +/- 200 bp from TSS
+#'
+#' @inheritParams meth_cpg
+meth_promoter_core = function(tissue, id_type="specimen", gene_type="ensembl_gene_id") {
+    stop("not implemented")
+}
+
+#' Extended promoter element of CpGs +/- 1500 bp from TSS
+#'
+#' @inheritParams meth_cpg
+meth_promoter_ext = function(tissue, id_type="specimen", gene_type="ensembl_gene_id") {
+    stop("not implemented")
+}
+
+#' Gene body element of CpGs +1500/TTS
+#'
+#' @inheritParams meth_cpg
+meth_gene_body = function(tissue, id_type="specimen", gene_type="ensembl_gene_id") {
+    stop("not implemented")
+}
+
+#' GRanges object of islands mapped to genes
+cpg_gene = function() {
+    res = module_file("data", "hm450.hg38.manifest.gencode.v22.rds", mustWork=TRUE) %>%
+        readRDS()
+}
+
+#' Tibble of CpGs mapped to TF binding sites
+cpg_tf = function() {
+    res = module_file("data", "hm450.hg19.ENCODE.TFBS.tsv.gz", mustWork=TRUE) %>%
+        readr::read_tsv()
 }

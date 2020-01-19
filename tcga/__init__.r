@@ -4,6 +4,7 @@ export_submodule('./filter')
 export_submodule('./cna')
 export_submodule('./cna_old')
 export_submodule('./mirna_seq')
+export_submodule('./meth_cpg')
 clinical = import('./clinical')$clinical
 cohorts = import('./cohorts')$cohorts
 mutations = import('./mutations')$mutations
@@ -16,5 +17,4 @@ intersect = import('./intersect')$intersect
 purity = import('./purity')$purity
 aneuploidy = import('./aneuploidy')$aneuploidy
 meth = import('./methylation')$methylation
-meth_cpg = import('./meth_cpg')$meth_cpg
 immune = import('./immune')$immune
