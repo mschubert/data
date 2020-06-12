@@ -5,12 +5,7 @@
 
 #' List all available tissues
 cohorts = function() {
-    file = h5::h5file(module_file("cache", "rna_seq2_vst.gctx"), mode="r")
+    clin = .io$load(module_file("cache", "clinical.RData"))
 
-    #TODO: check right transpose in h5 file
-    barcodes = file["/0/META/COL/id"][]
-    studies = .bc$barcode2study(barcodes)
-    re = unique(sort(studies))
-    h5::h5close(file)
-    re
+    unique(.bc$barcode2study(toupper(clin$patient.bcr_patient_barcode)))
 }
