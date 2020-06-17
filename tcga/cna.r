@@ -23,6 +23,23 @@ cna_segments = function(cohort, barcode="specimen", granges=FALSE) {
     cna
 }
 
+#' Get copy number segments
+#'
+#' docs: https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/CNV_Pipeline/
+#'
+#' @param barcode  Where to cut the barcode, either "patient", "specimen", or "full"
+#' @return         A data.frame or GRanges object
+cna_segments_ascat = function(barcode="specimen", granges=FALSE) {
+    fpath = module_file("cache")
+    cna = readRDS(file.path(fpath, "cnv_segments_ascat2.rds")) %>%
+        .map_id(id_type=barcode, along="Sample")
+
+    if (granges)
+        cna = GenomicRanges::makeGRangesFromDataFrame(cna,
+            start.field="Start", end.field="End", keep.extra.columns=TRUE)
+    cna
+}
+
 #' Get copy number for chromosomes
 #'
 #' @param cohort   The cohort(s) to get expression for
