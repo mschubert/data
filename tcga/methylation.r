@@ -13,15 +13,15 @@ methylation = function(tissue, id_type="specimen", cpg=c("stdev", "avg"),
                        mvalues=FALSE, genes=TRUE, ...) {
     fname = sprintf("meth_%s.gctx", match.arg(cpg))
     file = rhdf5::H5Fopen(module_file("cache", fname))
+    on.exit(rhdf5::H5Fclose(file))
 
     barcodes = file$"/0/META/COL/id"
     studies = .bc$barcode2study(barcodes)
     sample_idx = which(studies %in% tissue)
 
     all_genes = file$"/0/META/ROW/id"
-    if (identical(genes, TRUE)) {
-        gene_idx = seq_along(all_genes)
-    } else {
+    gene_idx = seq_along(all_genes)
+    if (! identical(genes, TRUE)) {
         gene_idx = match(genes, all_genes)
         no_match = is.na(gene_idx)
         if (any(no_match)) {
@@ -32,14 +32,14 @@ methylation = function(tissue, id_type="specimen", cpg=c("stdev", "avg"),
     }
 
     data = file&"/0/DATA/0/matrix"
+    # indexing variable lookup fails: https://github.com/grimbough/rhdf5/issues/69
+    data = data[]
     # drop=F is unsupported: https://github.com/grimbough/rhdf5/issues/68
     data = matrix(data[gene_idx, sample_idx], nrow=length(gene_idx), ncol=length(sample_idx))
     colnames(data) = barcodes[sample_idx]
     rownames(data) = all_genes[gene_idx]
 
-    rhdf5::H5Fclose(file)
     re = .map_id(data, id_type=id_type, ...)
-
     if (mvalues)
         re[] = log2(re/(1-re))
     re
