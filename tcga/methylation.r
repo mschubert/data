@@ -12,7 +12,7 @@
 methylation = function(tissue, id_type="specimen", cpg=c("stdev", "avg"),
                        mvalues=FALSE, genes=TRUE, ...) {
     fname = sprintf("meth_%s.gctx", match.arg(cpg))
-    file = rhdf5::H5Fopen(module_file("cache", fname))
+    file = rhdf5::H5Fopen(module_file("cache", fname), flags="H5F_ACC_RDONLY")
     on.exit(rhdf5::H5Fclose(file))
 
     barcodes = file$"/0/META/COL/id"
