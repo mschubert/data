@@ -15,9 +15,10 @@ rna_seq = function(tissue, id_type="specimen", trans="raw", annot=FALSE) {
     fpath = module_file(paste0("TCGAbiolinks-downloader/rna_seq_", trans))
     expr = .io$load(file.path(fpath, paste0("TCGA-", tissue, ".RData")))
 
-    if (identical(annot, TRUE))
+    if (identical(annot, TRUE)) {
+        colnames(expr) = .map_id(colnames(expr), id_type=id_type)
         expr
-    else {
+    } else {
         re = .map_id(SummarizedExperiment::assay(expr), id_type=id_type)
         if (is.character(annot))
             rownames(re) = SummarizedExperiment::rowData(expr)[[annot]]
