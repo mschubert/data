@@ -76,6 +76,8 @@ cna_bands = function(cohort, barcode="specimen", chr_excl=c("Y","MT")) {
 #' @inheritParams  cna_chrs
 cna_genes = function(cohort, barcode="specimen", gene="ensembl_gene_id",
                      chr_excl=c("Y","MT")) {
+    if (gene == "hgnc_symbol")
+        gene = "external_gene_name"
     feat_ranges =.seq$coords$gene(idtype=gene, granges=TRUE)
     obj = .cached(cohort, gene, feat_ranges)
     .filter(obj, gene, barcode, chr_excl=chr_excl)
