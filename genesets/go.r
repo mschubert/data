@@ -1,5 +1,4 @@
 import_package('dplyr', attach=TRUE)
-io = import('ebits/io')
 
 #' Retrieves GO categories for HGNC symbols
 #'
@@ -10,10 +9,10 @@ io = import('ebits/io')
 #' @param valid  Character vector of symbols for selecting only populated categories
 #' @param min_n  Minimum number of genes in category to consider it populated
 #' @param ontology  Character vector of ontologies to use: BP (default), MF, CC
-#' @param leaf_depth  Filter by leaf and branches up to level (default: 3)
+#' @param leaf_depth  Filter by leaf and branches up to level (default: no filter)
 #' @param as_list   Whether to return a list of character vectors
 go = function(dset="hsapiens_gene_ensembl", genes="hgnc_symbol", valid=NULL,
-              min_n=4, ontology="BP", leaf_depth=3, as_list=FALSE) {
+              min_n=4, ontology="BP", leaf_depth=Inf, as_list=FALSE) {
     stopifnot(ontology == "BP") #todo: not implemented
     fname = file.path(module_file("cache", mustWork=TRUE),
                       paste0(paste("go", dset, genes, sep="-"), ".rds"))
@@ -42,16 +41,17 @@ go = function(dset="hsapiens_gene_ensembl", genes="hgnc_symbol", valid=NULL,
     g = igraph::graph.data.frame(BP, vertices=terms)
     gs = igraph::induced_subgraph(g, valid_sets)
 
-    return_sets = c()
-    for (i in seq_len(leaf_depth)) {
-        leaves = igraph::V(gs)$name[igraph::degree(gs, mode="in")==0]
-        return_sets = c(return_sets, leaves)
-        gs = igraph::delete_vertices(gs, leaves)
+    if (is.finite(leaf_depth)) {
+        return_sets = c()
+        for (i in seq_len(leaf_depth)) {
+            leaves = igraph::V(gs)$name[igraph::degree(gs, mode="in")==0]
+            return_sets = c(return_sets, leaves)
+            gs = igraph::delete_vertices(gs, leaves)
+        }
+        terms = terms[terms$go_id %in% return_sets,]
     }
 
-    res = terms[terms$go_id %in% return_sets,] %>%
-        dplyr::inner_join(sets)
-
+    res = dplyr::inner_join(terms, sets)
     if (as_list) {
         res$both = paste(res$go_id, res$Term)
         unstack(res[c(genes, "both")])
