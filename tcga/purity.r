@@ -1,14 +1,27 @@
 `%>%` = magrittr::`%>%`
+.bc = import('./barcode')
 .map_id = import('./map_id')$map_id
 
-#' Get tumor purity estimates
+purity = function(...) {
+    message("[tcga/purity] using purity_aran2015")
+    purity_aran2015(...)
+}
+
+#' Get tumor purity estimates from Aran & Butte (2015, Nat Comms)
 #'
-#' from: https://www.nature.com/articles/ncomms9971
+#' Suppl. Data 1 from https://www.nature.com/articles/ncomms9971
+#'
+#' Data sources are the following:
+#' * estimate: ESTIMATE method doi.org/10.1038/ncomms3612 (with additional cohorts)
+#' * absolute: ABSOLUTE method doi.org/10.1038/nbt.2203
+#' * leuko_meth: avg_beta_cpg(over 30% meth in cancer, under 5% in blood) / 0.85
+#' * he_stain: H&E staining as described in 9971
+#' * consensus: computed consensus estimate as described in 9971
 #'
 #' @param tissue   The tissue(s) to get expression for
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
-#' @return         A data.frame or GRanges object (Segment_Mean is log2(copy-number)-1)
-purity = function(tissue=NULL, id_type="specimen", granges=FALSE) {
+#' @return         A data.frame with purity estimates
+purity_aran2015 = function(tissue=NULL, id_type="specimen") {
     nan2na_num = function(x) as.numeric(ifelse(is.nan(x), NA, x))
 
     fpath = module_file("TCGAbiolinks-downloader")
@@ -17,9 +30,9 @@ purity = function(tissue=NULL, id_type="specimen", granges=FALSE) {
                          Sample = `Sample ID`,
                          estimate = nan2na_num(ESTIMATE),
                          absolute = nan2na_num(ABSOLUTE),
-                         lump = nan2na_num(LUMP),
-                         IHC = nan2na_num(IHC),
-                         CPE = nan2na_num(CPE)) %>%
+                         leuko_meth = nan2na_num(LUMP),
+                         he_stain = nan2na_num(IHC),
+                         consensus = nan2na_num(CPE)) %>%
         .map_id(id_type=id_type, along="Sample")
 
     if (is.null(tissue))
