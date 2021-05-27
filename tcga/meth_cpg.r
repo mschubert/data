@@ -3,6 +3,32 @@
 .map_id = import('./map_id')$map_id
 `%>%` = magrittr::`%>%`
 
+#' Get gene annotations for CpGs for HM450
+#'
+#' @return  A data.frame with CpG annotations
+meth_cpg2gene = function() {
+    fname = "HM450.hg38.manifest.gencode.v37.tsv.gz"
+    fpath = file.path(module_file("cache"), fname)
+    if (!file.exists(fpath)) {
+        url = paste0("http://zhouserver.research.chop.edu/InfiniumAnnotation/20210414/HM450/", fname)
+        download.file(url, fpath)
+    }
+    readr::read_tsv(fpath)
+}
+
+#' Get annotations for CpG islands for HM450
+#'
+#' @return  A data.frame with CpG annotations
+meth_cpg2island = function() {
+    fname = "HM450.hg38.manifest.CpGIsland.tsv.gz"
+    fpath = file.path(module_file("cache"), fname)
+    if (!file.exists(fpath)) {
+        url = paste0("http://zhouserver.research.chop.edu/InfiniumAnnotation/20210414/HM450/", fname)
+        download.file(url, fpath)
+    }
+    readr::read_tsv(fpath)
+}
+
 #' Get a matrix for all CpG methylation beta values
 #'
 #' docs: https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/
