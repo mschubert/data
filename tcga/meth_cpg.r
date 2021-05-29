@@ -42,6 +42,10 @@ meth_cg2tf = function() {
     readr::read_tsv(fpath)
 }
 
+#' Define core, extended promoter; gene and gene body
+meth_cg2custom = function() {
+}
+
 #' Get a matrix for all CpG methylation beta values
 #'
 #' docs: https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/
@@ -70,20 +74,45 @@ meth_cpg = function(tissue, id_type="specimen", annot=FALSE) {
 #' @param gene    Gene identifier: ensembl_{gene,transcript}_id, external_gene_name
 #' @return        A matrix with summarized methylation: (core) promoter, body, etc.
 meth_summary = function(tissue, gene="ensembl_gene_id") {
-    if (gene %in% c("gene_name", "hgnc_symbol"))
-        gene = "external_gene_name"
-    sid = rlang::sym(gene)
-    params = sprintf("%s-%s.rds", tissue, gene)
-    fpath = file.path(module_file("cache", "meth_summary"), params)
-    if (file.exists(fpath))
-        return(readRDS(fpath))
-    cgmat = meth_cpg(tissue)
+    one_cohort = function(tissue) {
+        if (gene %in% c("gene_name", "hgnc_symbol"))
+            gene = "external_gene_name"
+        sid = rlang::sym(gene)
+        params = sprintf("%s-%s.rds", tissue, gene)
+        fpath = file.path(module_file("cache", "meth_summary"), params)
+        if (file.exists(fpath))
+            return(readRDS(fpath))
+        cgmat = meth_cpg(tissue)
 
-    c2g = meth_cg2gene() %>%
+        c2g = m2g %>%
+            filter(probe_id %in% rownames(cgmat)) %>%
+            GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
+        .do = . %>%
+            join_overlap_intersect(c2g) %>% as.data.frame() %>% dplyr::as_tibble() %>%
+            select(probe_id, !!sid) %>% filter(!!sid != "") %>% dplyr::distinct() %>% unstack()
+        cgs = list(
+            gene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
+            core = genes %>% anchor_5p() %>% mutate(width=400) %>% shift_upstream(200) %>% .do(),
+            ext = genes %>% anchor_5p() %>% mutate(width=3000) %>% shift_upstream(1500) %>% .do(),
+            body = genes %>% .do()
+        )
+
+        sums = function(cg) {
+            gmeans = function(cgi) colMeans(cgmat[rownames(cgmat) %in% cgi,,drop=FALSE])
+    #        res = pbapply::pblapply(unstack(cg), gmeans)
+            res = parallel::mclapply(cg, gmeans)
+            do.call(rbind, res)
+        }
+        res = lapply(cgs, sums)
+
+        saveRDS(res, file=fpath)
+        res
+    }
+
+    m2g = meth_cg2gene() %>%
         dplyr::select(seqnames=CpG_chrm, start=CpG_beg, end=CpG_end,
-                      strand=probe_strand, probe_id=probeID) %>%
-        filter(probe_id %in% rownames(cgmat)) %>%
-        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
+                      strand=probe_strand, probe_id=probeID)
+
     genes = .seq$gene_table() %>%
         dplyr::select(chromosome_name, strand, start=start_position,
                       end=end_position, ensembl_gene_id, external_gene_name,
@@ -92,26 +121,11 @@ meth_summary = function(tissue, gene="ensembl_gene_id") {
                       strand = setNames(c("+","-"),c(1,-1))[as.character(strand)]) %>%
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
 
-    .do = . %>%
-        join_overlap_intersect(c2g) %>% as.data.frame() %>% dplyr::as_tibble() %>%
-        select(probe_id, !!sid) %>% filter(!!sid != "") %>% dplyr::distinct() %>% unstack()
-    cgs = list(
-        gene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
-        core = genes %>% anchor_5p() %>% mutate(width=400) %>% shift_upstream(200) %>% .do(),
-        ext = genes %>% anchor_5p() %>% mutate(width=3000) %>% shift_upstream(1500) %>% .do(),
-        body = genes %>% .do()
-    )
-
-    sums = function(cg) {
-        gmeans = function(cgi) colMeans(cgmat[rownames(cgmat) %in% cgi,,drop=FALSE])
-#        res = pbapply::pblapply(unstack(cg), gmeans)
-        res = parallel::mclapply(cg, gmeans)
-        do.call(rbind, res)
-    }
-    res = lapply(cgs, sums)
-
-    saveRDS(res, file=fpath)
-    res
+    res = lapply(tissue, one_cohort)
+    list(gene = lapply(res, function(r) r$gene) %>% narray::stack(along=2),
+         core = lapply(res, function(r) r$core) %>% narray::stack(along=2),
+         ext = lapply(res, function(r) r$ext) %>% narray::stack(along=2),
+         body = lapply(res, function(r) r$body) %>% narray::stack(along=2))
 }
 
 if (is.null(module_name())) {
