@@ -11,6 +11,8 @@
 #' @return         A data.frame with data for all the simple mutations
 methylation = function(tissue, id_type="specimen", cpg=c("stdev", "avg"),
                        mvalues=FALSE, genes=TRUE, ...) {
+    .Deprecated(c("meth_cpg", "meth_summary"))
+
     fname = sprintf("meth_%s.gctx", match.arg(cpg))
     file = rhdf5::H5Fopen(module_file("cache", fname), flags="H5F_ACC_RDONLY")
     on.exit(rhdf5::H5Fclose(file))

@@ -1,4 +1,6 @@
+import_package("plyranges", attach=TRUE)
 .io = import('io')
+.seq = import('seq')
 .bc = import('./barcode')
 .map_id = import('./map_id')$map_id
 `%>%` = magrittr::`%>%`
@@ -29,6 +31,13 @@ meth_cpg2island = function() {
     readr::read_tsv(fpath)
 }
 
+#' Get CpGs for TF binding sites
+meth_cpg2tf = function() {
+    fname = "hm450.hg19.ENCODE.TFBS.tsv.gz"
+    res = module_file("data", fname, mustWork=TRUE) %>%
+        readr::read_tsv()
+}
+
 #' Get a matrix for all CpG methylation beta values
 #'
 #' docs: https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/
@@ -47,39 +56,59 @@ meth_cpg = function(tissue, id_type="specimen", annot=FALSE) {
         re = .map_id(SummarizedExperiment::assay(meth), id_type=id_type)
         if (is.character(annot))
             rownames(re) = SummarizedExperiment::rowData(meth)[[annot]]
-        re
+        re[rowSums(is.na(re)) == 0,] # only include cgs with full data
     }
 }
 
-#' Core promoter element of CpGs +/- 200 bp from TSS
+#' Methylation level summary at core/extended promoter, gene body, or both
 #'
-#' @inheritParams meth_cpg
-meth_promoter_core = function(tissue, id_type="specimen", gene_type="ensembl_gene_id") {
-    stop("not implemented")
+#' @param tissue   The tissue(s) to get expression for
+#' @param id_type  Gene identifier: ensembl_{gene,transcript}_id, external_gene_name
+#' @return         A matrix with summarized methylation: (core) promoter, body, etc.
+meth_summary = function(tissue, id_type="ensembl_gene_id") {
+    params = paste(c("meth_summary", tissue, id_type), collapse="-")
+    fpath = file.path(module_file("cache"), paste0(params, ".rds"))
+    if (file.exists(fpath))
+        return(readRDS(fpath))
+    cgmat = meth_cpg(tissue)
+
+    c2g = meth_cpg2gene() %>%
+        dplyr::select(seqnames=CpG_chrm, start=CpG_beg, end=CpG_end,
+                      strand=probe_strand, probe_id=probeID) %>%
+        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
+    genes = .seq$gene_table() %>%
+        dplyr::select(chromosome_name, strand, start=start_position,
+                      end=end_position, ensembl_gene_id, external_gene_name,
+                      ensembl_transcript_id) %>%
+        dplyr::mutate(chromosome_name = paste0("chr", chromosome_name),
+                      strand = setNames(c("+","-"),c(1,-1))[as.character(strand)]) %>%
+        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
+
+    .do = . %>%
+        join_overlap_intersect(c2g) %>% as.data.frame() %>% dplyr::as_tibble() %>%
+        select(probe_id, rlang::sym(id_type)) %>% dplyr::distinct()
+    cgs = list(
+        gene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
+        core = genes %>% anchor_5p() %>% mutate(width=400) %>% shift_upstream(200) %>% .do(),
+        ext = genes %>% anchor_5p() %>% mutate(width=3000) %>% shift_upstream(1500) %>% .do(),
+        body = genes %>% .do()
+    )
+
+    sums = function(cg) {
+        cg2 = setNames(cg[[2]], cg[[1]])
+        mat2 = cgmat
+        narray::intersect(cg2, mat2, along=1)
+        narray::map(mat2, along=1, mean, subsets=cg2)
+    }
+    res = lapply(cgs, sums)
+
+    saveRDS(res, file=fpath)
+    res
 }
 
-#' Extended promoter element of CpGs +/- 1500 bp from TSS
-#'
-#' @inheritParams meth_cpg
-meth_promoter_ext = function(tissue, id_type="specimen", gene_type="ensembl_gene_id") {
-    stop("not implemented")
-}
-
-#' Gene body element of CpGs +1500/TTS
-#'
-#' @inheritParams meth_cpg
-meth_gene_body = function(tissue, id_type="specimen", gene_type="ensembl_gene_id") {
-    stop("not implemented")
-}
-
-#' GRanges object of islands mapped to genes
-cpg_gene = function() {
-    res = module_file("data", "hm450.hg38.manifest.gencode.v22.rds", mustWork=TRUE) %>%
-        readRDS()
-}
-
-#' Tibble of CpGs mapped to TF binding sites
-cpg_tf = function() {
-    res = module_file("data", "hm450.hg19.ENCODE.TFBS.tsv.gz", mustWork=TRUE) %>%
-        readr::read_tsv()
+if (is.null(module_name())) {
+    .cohorts = import('./cohorts')$cohorts
+    for (tissue in .cohorts())
+        for (id_type in c("ensembl_gene_id", "external_gene_name"))
+            res = meth_summary(tissue, id_type)
 }
