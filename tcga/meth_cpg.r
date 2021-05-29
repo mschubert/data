@@ -8,7 +8,7 @@ import_package("plyranges", attach=TRUE)
 #' Get gene annotations for CpGs for HM450
 #'
 #' @return  A data.frame with CpG annotations
-meth_cpg2gene = function() {
+meth_cg2gene = function() {
     fname = "HM450.hg38.manifest.gencode.v37.tsv.gz"
     fpath = file.path(module_file("cache"), fname)
     if (!file.exists(fpath)) {
@@ -21,7 +21,7 @@ meth_cpg2gene = function() {
 #' Get annotations for CpG islands for HM450
 #'
 #' @return  A data.frame with CpG annotations
-meth_cpg2island = function() {
+meth_cg2island = function() {
     fname = "HM450.hg38.manifest.CpGIsland.tsv.gz"
     fpath = file.path(module_file("cache"), fname)
     if (!file.exists(fpath)) {
@@ -32,10 +32,14 @@ meth_cpg2island = function() {
 }
 
 #' Get CpGs for TF binding sites
-meth_cpg2tf = function() {
-    fname = "hm450.hg19.ENCODE.TFBS.tsv.gz"
-    res = module_file("data", fname, mustWork=TRUE) %>%
-        readr::read_tsv()
+meth_cg2tf = function() {
+    fname = "HM450.hg19.ENCODE.TFBS.tsv.gz"
+    fpath = file.path(module_file("cache"), fname)
+    if (!file.exists(fpath)) {
+        url = paste0("http://zhouserver.research.chop.edu/InfiniumAnnotation/20180909/HM450/", fname)
+        download.file(url, fpath)
+    }
+    readr::read_tsv(fpath)
 }
 
 #' Get a matrix for all CpG methylation beta values
@@ -62,19 +66,23 @@ meth_cpg = function(tissue, id_type="specimen", annot=FALSE) {
 
 #' Methylation level summary at core/extended promoter, gene body, or both
 #'
-#' @param tissue   The tissue(s) to get expression for
-#' @param id_type  Gene identifier: ensembl_{gene,transcript}_id, external_gene_name
-#' @return         A matrix with summarized methylation: (core) promoter, body, etc.
-meth_summary = function(tissue, id_type="ensembl_gene_id") {
-    params = paste(c("meth_summary", tissue, id_type), collapse="-")
-    fpath = file.path(module_file("cache"), paste0(params, ".rds"))
+#' @param tissue  The tissue(s) to get expression for
+#' @param gene    Gene identifier: ensembl_{gene,transcript}_id, external_gene_name
+#' @return        A matrix with summarized methylation: (core) promoter, body, etc.
+meth_summary = function(tissue, gene="ensembl_gene_id") {
+    if (gene %in% c("gene_name", "hgnc_symbol"))
+        gene = "external_gene_name"
+    sid = rlang::sym(gene)
+    params = sprintf("%s-%s.rds", tissue, gene)
+    fpath = file.path(module_file("cache", "meth_summary"), params)
     if (file.exists(fpath))
         return(readRDS(fpath))
     cgmat = meth_cpg(tissue)
 
-    c2g = meth_cpg2gene() %>%
+    c2g = meth_cg2gene() %>%
         dplyr::select(seqnames=CpG_chrm, start=CpG_beg, end=CpG_end,
                       strand=probe_strand, probe_id=probeID) %>%
+        filter(probe_id %in% rownames(cgmat)) %>%
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
     genes = .seq$gene_table() %>%
         dplyr::select(chromosome_name, strand, start=start_position,
@@ -86,7 +94,7 @@ meth_summary = function(tissue, id_type="ensembl_gene_id") {
 
     .do = . %>%
         join_overlap_intersect(c2g) %>% as.data.frame() %>% dplyr::as_tibble() %>%
-        select(probe_id, rlang::sym(id_type)) %>% dplyr::distinct()
+        select(probe_id, !!sid) %>% filter(!!sid != "") %>% dplyr::distinct() %>% unstack()
     cgs = list(
         gene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
         core = genes %>% anchor_5p() %>% mutate(width=400) %>% shift_upstream(200) %>% .do(),
@@ -95,10 +103,10 @@ meth_summary = function(tissue, id_type="ensembl_gene_id") {
     )
 
     sums = function(cg) {
-        cg2 = setNames(cg[[2]], cg[[1]])
-        mat2 = cgmat
-        narray::intersect(cg2, mat2, along=1)
-        narray::map(mat2, along=1, mean, subsets=cg2)
+        gmeans = function(cgi) colMeans(cgmat[rownames(cgmat) %in% cgi,,drop=FALSE])
+#        res = pbapply::pblapply(unstack(cg), gmeans)
+        res = parallel::mclapply(cg, gmeans)
+        do.call(rbind, res)
     }
     res = lapply(cgs, sums)
 
@@ -108,6 +116,7 @@ meth_summary = function(tissue, id_type="ensembl_gene_id") {
 
 if (is.null(module_name())) {
     .cohorts = import('./cohorts')$cohorts
+    options(mc.cores = 10L)
     for (tissue in .cohorts())
         for (id_type in c("ensembl_gene_id", "external_gene_name"))
             res = meth_summary(tissue, id_type)
