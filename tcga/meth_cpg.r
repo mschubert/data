@@ -91,7 +91,7 @@ meth_summary = function(tissue, gene="ensembl_gene_id") {
             join_overlap_intersect(c2g) %>% as.data.frame() %>% dplyr::as_tibble() %>%
             select(probe_id, !!sid) %>% filter(!!sid != "") %>% dplyr::distinct() %>% unstack()
         cgs = list(
-            gene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
+            pgene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
             core = genes %>% anchor_5p() %>% mutate(width=400) %>% shift_upstream(200) %>% .do(),
             ext = genes %>% anchor_5p() %>% mutate(width=3000) %>% shift_upstream(1500) %>% .do(),
             body = genes %>% .do()
@@ -103,7 +103,7 @@ meth_summary = function(tissue, gene="ensembl_gene_id") {
             res = parallel::mclapply(cg, gmeans)
             do.call(rbind, res)
         }
-        res = lapply(cgs, sums)
+        res = lapply(cgs, sums) %>% narray::stack()
 
         saveRDS(res, file=fpath)
         res
@@ -121,11 +121,7 @@ meth_summary = function(tissue, gene="ensembl_gene_id") {
                       strand = setNames(c("+","-"),c(1,-1))[as.character(strand)]) %>%
         GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
 
-    res = lapply(tissue, one_cohort)
-    list(gene = lapply(res, function(r) r$gene) %>% narray::stack(along=2),
-         core = lapply(res, function(r) r$core) %>% narray::stack(along=2),
-         ext = lapply(res, function(r) r$ext) %>% narray::stack(along=2),
-         body = lapply(res, function(r) r$body) %>% narray::stack(along=2))
+    lapply(tissue, one_cohort) %>% narray::stack(along=1)
 }
 
 if (is.null(module_name())) {
