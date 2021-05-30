@@ -42,10 +42,6 @@ meth_cg2tf = function() {
     readr::read_tsv(fpath)
 }
 
-#' Define core, extended promoter; gene and gene body
-meth_cg2custom = function() {
-}
-
 #' Get a matrix for all CpG methylation beta values
 #'
 #' docs: https://docs.gdc.cancer.gov/Data/Bioinformatics_Pipelines/
@@ -68,6 +64,46 @@ meth_cpg = function(tissue, id_type="specimen", annot=FALSE) {
     }
 }
 
+#' Provide a mapping between gene IDs and cg IDs
+#'
+#' @param gene   Gene identifier: ensembl_{gene,transcript}_id, external_gene_name
+#' @param valid  A character vector of cg IDs to include
+#' @return       A data.frame with columns for cg ID and gene ID
+meth_mapping = function(gene="ensembl_gene_id", valid=NULL) {
+    if (gene %in% c("gene_name", "hgnc_symbol"))
+        gene = "external_gene_name"
+    sid = rlang::sym(gene)
+    fpath = file.path(module_file("cache", "meth_mapping"), sprintf("%s.rds", gene))
+    if (file.exists(fpath))
+        return(readRDS(fpath))
+
+    genes = .seq$gene_table() %>%
+        dplyr::select(chromosome_name, strand, start=start_position,
+                      end=end_position, ensembl_gene_id, external_gene_name,
+                      ensembl_transcript_id) %>%
+        dplyr::mutate(chromosome_name = paste0("chr", chromosome_name),
+                      strand = setNames(c("+","-"),c(1,-1))[as.character(strand)]) %>%
+        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
+
+    c2g = meth_cg2gene() %>%
+        dplyr::select(seqnames=CpG_chrm, start=CpG_beg, end=CpG_end,
+                      strand=probe_strand, probe_id=probeID) %>%
+        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
+
+    .do = . %>%
+        join_overlap_intersect(c2g) %>% as.data.frame() %>% dplyr::as_tibble() %>%
+        select(probe_id, !!sid) %>% filter(!!sid != "") %>% dplyr::distinct()
+    cgs = list(
+        pgene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
+        core = genes %>% anchor_5p() %>% mutate(width=400) %>% shift_upstream(200) %>% .do(),
+        ext = genes %>% anchor_5p() %>% mutate(width=3000) %>% shift_upstream(1500) %>% .do(),
+        body = genes %>% .do()
+    )
+
+    saveRDS(cgs, file=fpath)
+    cgs
+}
+
 #' Methylation level summary at core/extended promoter, gene body, or both
 #'
 #' @param tissue  The tissue(s) to get expression for
@@ -77,49 +113,23 @@ meth_summary = function(tissue, gene="ensembl_gene_id") {
     one_cohort = function(tissue) {
         if (gene %in% c("gene_name", "hgnc_symbol"))
             gene = "external_gene_name"
-        sid = rlang::sym(gene)
-        params = sprintf("%s-%s.rds", tissue, gene)
-        fpath = file.path(module_file("cache", "meth_summary"), params)
+        fpath = file.path(module_file("cache", "meth_summary"), sprintf("%s-%s.rds", tissue, gene))
         if (file.exists(fpath))
             return(readRDS(fpath))
-        cgmat = meth_cpg(tissue)
-
-        c2g = m2g %>%
-            filter(probe_id %in% rownames(cgmat)) %>%
-            GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
-        .do = . %>%
-            join_overlap_intersect(c2g) %>% as.data.frame() %>% dplyr::as_tibble() %>%
-            select(probe_id, !!sid) %>% filter(!!sid != "") %>% dplyr::distinct() %>% unstack()
-        cgs = list(
-            pgene = genes %>% anchor_3p() %>% stretch(1500) %>% .do(),
-            core = genes %>% anchor_5p() %>% mutate(width=400) %>% shift_upstream(200) %>% .do(),
-            ext = genes %>% anchor_5p() %>% mutate(width=3000) %>% shift_upstream(1500) %>% .do(),
-            body = genes %>% .do()
-        )
 
         sums = function(cg) {
             gmeans = function(cgi) colMeans(cgmat[rownames(cgmat) %in% cgi,,drop=FALSE])
-    #        res = pbapply::pblapply(unstack(cg), gmeans)
             res = parallel::mclapply(cg, gmeans)
             do.call(rbind, res)
         }
+        cgmat = meth_cpg(tissue)
+        cgs = meth_mapping(gene) %>%
+            lapply(. %>% filter(probe_id %in% rownames(cgmat)) %>% unstack())
         res = lapply(cgs, sums) %>% narray::stack()
 
         saveRDS(res, file=fpath)
         res
     }
-
-    m2g = meth_cg2gene() %>%
-        dplyr::select(seqnames=CpG_chrm, start=CpG_beg, end=CpG_end,
-                      strand=probe_strand, probe_id=probeID)
-
-    genes = .seq$gene_table() %>%
-        dplyr::select(chromosome_name, strand, start=start_position,
-                      end=end_position, ensembl_gene_id, external_gene_name,
-                      ensembl_transcript_id) %>%
-        dplyr::mutate(chromosome_name = paste0("chr", chromosome_name),
-                      strand = setNames(c("+","-"),c(1,-1))[as.character(strand)]) %>%
-        GenomicRanges::makeGRangesFromDataFrame(keep.extra.columns=TRUE)
 
     lapply(tissue, one_cohort) %>% narray::stack(along=1)
 }
