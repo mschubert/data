@@ -8,3 +8,4 @@ bem = import('./bem')$bem
 cosmic = import('./cosmic')
 aneuploidy = import('./aneuploidy')$aneuploidy
 plot = import('./plot')
+meth = import('./meth')$meth
