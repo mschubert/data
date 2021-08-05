@@ -43,10 +43,10 @@ purity_aran2015 = function(tissue=NULL, id_type="specimen") {
 
 #' Get tumor purity and immune score from ESTIMATE (2013, Nat Comms)
 #'
-#' @return  ESTIMATE scores including stroma vs immune for GBM, LUSC, OV
+#' @return  ESTIMATE scores including stroma vs immune for 11 cohorts
 purity_estimate = function() {
     fpath = file.path(module_file("data"), "41467_2013_BFncomms3612_MOESM489_ESM.xlsx")
-    readxl::read_xlsx(fpath, skip=1) %>%
+    readxl::read_xlsx(fpath, sheet="RNASeqV2", skip=1) %>%
         dplyr::transmute(Sample = paste0(gsub(".", "-", ID, fixed=TRUE), "A"),
                          cohort = .bc$barcode2study(Sample),
                          stromal_score = `Stromal score`,
