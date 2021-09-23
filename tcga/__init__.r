@@ -19,3 +19,4 @@ bem = import('./bem')$bem
 intersect = import('./intersect')$intersect
 meth = import('./methylation')$methylation
 immune = import('./immune')$immune
+cell_frac = import('./cell_frac')$cell_frac
