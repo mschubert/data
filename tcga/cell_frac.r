@@ -28,6 +28,6 @@ cell_frac = function(cohort, method, id_type="specimen") {
         mat = readRDS(fpath)
 
     rownames(mat) = .map_id(rownames(mat), id_type=id_type)
-    mat = mat[,!duplicated(colnames(mat))]
+    mat = mat[,!duplicated(rownames(mat))]
     mat
 }
