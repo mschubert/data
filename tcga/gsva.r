@@ -6,10 +6,14 @@
 gsva = function(cohort, setname, id_type="specimen") {
     fdir = file.path(module_file(), "cache", "gsva", cohort)
     fpath = file.path(fdir, sprintf("%s.rds", setname))
+    is_std_coll = is.character(setname) && length(setname == 1)
 
     if (!file.exists(fpath)) {
-        dir.create(fdir, showWarnings=FALSE, recursive=TRUE)
-        sets = .gset$get_human(setname)
+        if (is_std_coll) {
+            dir.create(fdir, showWarnings=FALSE, recursive=TRUE)
+            sets = .gset$get_human(setname)
+        } else
+            sets = setname
 
         # sum raw counts, otherwise too many hgnc_symbol duplicates
         expr = .rnaseq(cohort, id_type="full", trans="raw")
@@ -19,7 +23,8 @@ gsva = function(cohort, setname, id_type="specimen") {
         expr = SummarizedExperiment::assay(DESeq2::vst(eset))
 
         scores = GSVA::gsva(expr, sets, parallel.sz=10)
-        saveRDS(scores, file=fpath)
+        if (is_std_coll)
+            saveRDS(scores, file=fpath)
     } else
         scores = readRDS(fpath)
 
