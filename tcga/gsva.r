@@ -15,13 +15,14 @@ gsva = function(cohort, setname, id_type="specimen") {
         } else
             sets = setname
 
-        # sum raw counts, otherwise too many hgnc_symbol duplicates
-        expr = .rnaseq(cohort, id_type="full", trans="raw")
-        rownames(expr) = .idmap$gene(rownames(expr), to="hgnc_symbol")
-        expr = narray::map(expr, along=1, sum, subsets=rownames(expr))
-        eset = DESeq2::DESeqDataSetFromMatrix(expr, colData=data.frame(id=colnames(expr)), design=~1)
-        expr = SummarizedExperiment::assay(DESeq2::vst(eset))
+        if (cohort == "pan") {
+            expr = .rnaseq(cohort, id_type="full", trans="raw")
+            eset = DESeq2::DESeqDataSetFromMatrix(expr, colData=data.frame(id=colnames(expr)), design=~1)
+            expr = SummarizedExperiment::assay(DESeq2::varianceStabilizingTransformation(eset))
+        } else
+            expr = .rnaseq(cohort, id_type="full", trans="vst")
 
+        rownames(expr) = .idmap$gene(rownames(expr), to="hgnc_symbol")
         scores = GSVA::gsva(expr, sets, parallel.sz=10)
         if (is_std_coll)
             saveRDS(scores, file=fpath)
