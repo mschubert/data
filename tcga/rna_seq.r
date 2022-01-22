@@ -10,10 +10,13 @@
 #' @param id_type  Where to cut the barcode, either "patient", "specimen", or "full"
 #' @param trans    Value transformation: 'raw', 'log2cpm', 'vst' (default: raw read counts)
 #' @param annot    Return SummarizedExperiment annotations or matrix w/ 'external_gene_name'
+#' @param excl_ffpe  Exclude FFPE (paraffin embedded) samples
 #' @param drop     Drop list if only one tissue requested
 #' @return         A matrix with HGNC symbols x TCGA samples
-rna_seq = function(tissue, id_type="specimen", trans="raw", annot=FALSE, drop=TRUE) {
+rna_seq = function(tissue, id_type="specimen", trans="raw", annot=FALSE, excl_ffpe=TRUE, drop=TRUE) {
     proc_one = function(expr) {
+        if (excl_ffpe)
+            expr = expr[,!(is.na(expr$is_ffpe) | expr$is_ffpe)]
         if (identical(annot, TRUE)) {
             colnames(expr) = .map_id(colnames(expr), id_type=id_type)
             expr
